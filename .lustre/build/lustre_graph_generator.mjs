@@ -1,1 +1,0 @@
-import { main } from '../../build/dev/javascript/lustre_graph_generator/lustre_graph_generator.mjs'; main();

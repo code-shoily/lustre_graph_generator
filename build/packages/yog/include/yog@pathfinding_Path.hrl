@@ -1,1 +1,0 @@
--record(path, {nodes :: list(integer()), total_weight :: any()}).

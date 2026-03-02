@@ -1,1 +1,0 @@
--record(queue, {front :: list(any()), back :: list(any())}).

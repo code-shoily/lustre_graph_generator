@@ -1,1 +1,0 @@
--record(stable_marriage, {matches :: gleam@dict:dict(integer(), integer())}).
