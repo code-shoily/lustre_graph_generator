@@ -13,20 +13,7 @@
   <script src="https://unpkg.com/layout-base/layout-base.js"></script>
   <script src="https://unpkg.com/cose-base/cose-base.js"></script>
   <script src="https://unpkg.com/cytoscape-fcose/cytoscape-fcose.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: 'hsl(199, 89%, 48%)',
-            'primary-hover': 'hsl(199, 89%, 40%)',
-            secondary: 'hsl(225, 63%, 45%)',
-          }
-        }
-      }
-    }
-  </script>
+  <link rel="stylesheet" href="/src/index.css">
 </head>
 
 <body
@@ -38,7 +25,8 @@
   </div>
   <div id="app"></div>
   <script type="module">
-    import "/.lustre/build/lustre_graph_generator.mjs";
+    import { main } from "/src/lustre_graph_generator.gleam";
+    main();
     document.getElementById("loading").remove();
   </script>
 </body>
