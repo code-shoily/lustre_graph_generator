@@ -16,7 +16,7 @@ jobs:
           otp-version: '27.2'
           gleam-version: '1.14.0'
           rebar3-version: '3.24.0'
-      - run: npm ci
+      - run: npm install
       - run: npm run build
       - uses: peaceiris/actions-gh-pages@v3
         with:
