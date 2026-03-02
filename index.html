@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎨 Yog Graph Playground</title>
+  <script src="https://unpkg.com/cytoscape@3.28.1/dist/cytoscape.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script src="https://unpkg.com/layout-base/layout-base.js"></script>
+  <script src="https://unpkg.com/cose-base/cose-base.js"></script>
+  <script src="https://unpkg.com/cytoscape-fcose/cytoscape-fcose.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: 'hsl(199, 89%, 48%)',
+            'primary-hover': 'hsl(199, 89%, 40%)',
+            secondary: 'hsl(225, 63%, 45%)',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+
+<body
+  class="bg-[#0f172a] bg-[radial-gradient(circle_at_top_right,_#1e293b,_#0f172a)] text-[#f8fafc] min-h-screen p-10 leading-relaxed font-sans">
+  <div id="loading" class="flex items-center justify-center min-h-[60vh]">
+    <div class="text-sky-400 font-bold text-2xl animate-pulse">
+      🎨 Loading Playground...
+    </div>
+  </div>
+  <div id="app"></div>
+  <script type="module">
+    import "./.lustre/build/lustre_graph_generator.mjs";
+    document.getElementById("loading").remove();
+  </script>
+</body>
+
+</html>
