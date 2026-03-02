@@ -5,7 +5,7 @@ import type * as $query from "../../lustre/dev/query.d.mts";
 import type * as $effect from "../../lustre/effect.d.mts";
 import type * as $vnode from "../../lustre/vdom/vnode.d.mts";
 
-declare class App<WLP, WLR, WLQ> extends _.CustomType {
+declare class App<WLP, WLQ, WLR> extends _.CustomType {
   /** @deprecated */
   constructor(
     init: (x0: any) => [any, $effect.Effect$<any>],
@@ -20,7 +20,7 @@ declare class App<WLP, WLR, WLQ> extends _.CustomType {
   view: (x0: any) => $vnode.Element$<any>;
 }
 
-export type App$<WLP, WLQ, WLR> = App<WLQ, WLR, WLP>;
+export type App$<WLR, WLQ, WLP> = App<WLP, WLR, WLQ>;
 
 declare class Simulation<WLS, WLT> extends _.CustomType {
   /** @deprecated */
@@ -43,7 +43,7 @@ declare class Simulation<WLS, WLT> extends _.CustomType {
   html: $vnode.Element$<any>;
 }
 
-export type Simulation$<WLT, WLS> = Simulation<WLS, WLT>;
+export type Simulation$<WLS, WLT> = Simulation<WLS, WLT>;
 
 export class Dispatch<WLU> extends _.CustomType {
   /** @deprecated */

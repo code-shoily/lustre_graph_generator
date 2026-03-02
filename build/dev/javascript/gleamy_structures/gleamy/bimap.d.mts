@@ -1,7 +1,7 @@
 import type * as $dict from "../../gleam_stdlib/gleam/dict.d.mts";
 import type * as _ from "../gleam.d.mts";
 
-declare class Bimap<JOX, JOY> extends _.CustomType {
+declare class Bimap<JOY, JOX> extends _.CustomType {
   /** @deprecated */
   constructor(from_key: $dict.Dict$<any, any>, to_key: $dict.Dict$<any, any>);
   /** @deprecated */
@@ -10,7 +10,7 @@ declare class Bimap<JOX, JOY> extends _.CustomType {
   to_key: $dict.Dict$<any, any>;
 }
 
-export type Bimap$<JOY, JOX> = Bimap<JOX, JOY>;
+export type Bimap$<JOY, JOX> = Bimap<JOY, JOX>;
 
 export function new$(): Bimap$<any, any>;
 

@@ -25,7 +25,7 @@ declare class Yielder<IKD> extends _.CustomType {
 
 export type Yielder$<IKD> = Yielder<IKD>;
 
-export class Next<IKE, IKF> extends _.CustomType {
+export class Next<IKF, IKE> extends _.CustomType {
   /** @deprecated */
   constructor(element: IKE, accumulator: IKF);
   /** @deprecated */
@@ -33,23 +33,23 @@ export class Next<IKE, IKF> extends _.CustomType {
   /** @deprecated */
   accumulator: IKF;
 }
-export function Step$Next<IKF, IKE>(
+export function Step$Next<IKE, IKF>(
   element: IKE,
   accumulator: IKF,
-): Step$<IKF, IKE>;
-export function Step$isNext<IKE, IKF>(value: Step$<IKF, IKE>): boolean;
-export function Step$Next$0<IKE, IKF>(value: Step$<IKF, IKE>): IKE;
-export function Step$Next$element<IKF, IKE>(value: Step$<IKF, IKE>): IKE;
-export function Step$Next$1<IKF, IKE>(value: Step$<IKF, IKE>): IKF;
-export function Step$Next$accumulator<IKF, IKE>(value: Step$<IKF, IKE>): IKF;
+): Step$<IKE, IKF>;
+export function Step$isNext<IKE, IKF>(value: Step$<IKE, IKF>): boolean;
+export function Step$Next$0<IKE, IKF>(value: Step$<IKE, IKF>): IKE;
+export function Step$Next$element<IKF, IKE>(value: Step$<IKE, IKF>): IKE;
+export function Step$Next$1<IKE, IKF>(value: Step$<IKE, IKF>): IKF;
+export function Step$Next$accumulator<IKE, IKF>(value: Step$<IKE, IKF>): IKF;
 
 export class Done extends _.CustomType {}
-export function Step$Done<IKE, IKF>(): Step$<IKF, IKE>;
-export function Step$isDone<IKE, IKF>(value: Step$<IKF, IKE>): boolean;
+export function Step$Done<IKF, IKE>(): Step$<IKE, IKF>;
+export function Step$isDone<IKF, IKE>(value: Step$<IKE, IKF>): boolean;
 
-export type Step$<IKF, IKE> = Next<IKE, IKF> | Done;
+export type Step$<IKE, IKF> = Next<IKF, IKE> | Done;
 
-declare class AnotherBy<IKH, IKG> extends _.CustomType {
+declare class AnotherBy<IKG, IKH> extends _.CustomType {
   /** @deprecated */
   constructor(
     argument$0: _.List<any>,

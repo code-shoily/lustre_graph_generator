@@ -193,9 +193,9 @@ declare class AbnormalStop extends _.CustomType {
   0: string;
 }
 
-export type Next$<PCN, PCO> = Continue<PCN, PCO> | NormalStop | AbnormalStop;
+export type Next$<PCO, PCN> = Continue<PCN, PCO> | NormalStop | AbnormalStop;
 
-declare class Builder<PCQ, PCP> extends _.CustomType {
+declare class Builder<PCP, PCQ> extends _.CustomType {
   /** @deprecated */
   constructor(
     interface$: $options.Interface$,
@@ -237,7 +237,7 @@ declare class Builder<PCQ, PCP> extends _.CustomType {
   tls_options: $option.Option$<$options.TlsCerts$>;
 }
 
-export type Builder$<PCP, PCQ> = Builder<PCQ, PCP>;
+export type Builder$<PCP, PCQ> = Builder<PCP, PCQ>;
 
 export type Socket = $socket.Socket$;
 

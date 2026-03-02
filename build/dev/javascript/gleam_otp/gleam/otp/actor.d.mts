@@ -28,7 +28,7 @@ declare class Unexpected extends _.CustomType {
 
 type Message$<GMW> = Message<GMW> | System | Unexpected;
 
-declare class Continue<GMY, GMX> extends _.CustomType {
+declare class Continue<GMX, GMY> extends _.CustomType {
   /** @deprecated */
   constructor(state: GMX, selector: $option.Option$<$process.Selector$<any>>);
   /** @deprecated */
@@ -44,7 +44,7 @@ declare class Stop extends _.CustomType {
   0: $process.ExitReason$;
 }
 
-export type Next$<GMY, GMX> = Continue<GMX, GMY> | Stop;
+export type Next$<GMX, GMY> = Continue<GMY, GMX> | Stop;
 
 declare class Self<GMZ, GNA> extends _.CustomType {
   /** @deprecated */
@@ -70,7 +70,7 @@ declare class Self<GMZ, GNA> extends _.CustomType {
   message_handler: (x0: any, x1: any) => Next$<any, any>;
 }
 
-type Self$<GMZ, GNA> = Self<GMZ, GNA>;
+type Self$<GMZ, GNA> = Self<GNA, GMZ>;
 
 export class Started<GNB> extends _.CustomType {
   /** @deprecated */
@@ -92,7 +92,7 @@ export function Started$Started$data<GNB>(value: Started$<GNB>): GNB;
 
 export type Started$<GNB> = Started<GNB>;
 
-declare class Initialised<GNC, GND, GNE> extends _.CustomType {
+declare class Initialised<GND, GNE, GNC> extends _.CustomType {
   /** @deprecated */
   constructor(
     state: GNC,
@@ -107,9 +107,9 @@ declare class Initialised<GNC, GND, GNE> extends _.CustomType {
   return$: GNE;
 }
 
-export type Initialised$<GNE, GND, GNC> = Initialised<GNE, GNC, GND>;
+export type Initialised$<GNC, GNE, GND> = Initialised<GNC, GND, GNE>;
 
-declare class Builder<GNG, GNF, GNH> extends _.CustomType {
+declare class Builder<GNF, GNH, GNG> extends _.CustomType {
   /** @deprecated */
   constructor(
     initialise: (x0: $process.Subject$<any>) => _.Result<
@@ -133,7 +133,7 @@ declare class Builder<GNG, GNF, GNH> extends _.CustomType {
   name: $option.Option$<$process.Name$<any>>;
 }
 
-export type Builder$<GNH, GNF, GNG> = Builder<GNG, GNF, GNH>;
+export type Builder$<GNF, GNG, GNH> = Builder<GNG, GNF, GNH>;
 
 export class InitTimeout extends _.CustomType {}
 export function StartError$InitTimeout(): StartError$;

@@ -103,25 +103,25 @@ export class LoopState<OIN, OIM> extends _.CustomType {
   /** @deprecated */
   state: OIM;
 }
-export function LoopState$LoopState<OIM, OIN>(
+export function LoopState$LoopState<OIN, OIM>(
   client_ip: _.Result<[$options.IpAddress$, number], undefined>,
   socket: $socket.Socket$,
   sender: $process.Subject$<Message$<any>>,
   transport: $transport.Transport$,
   state: OIM,
 ): LoopState$<OIM, OIN>;
-export function LoopState$isLoopState<OIN, OIM>(
+export function LoopState$isLoopState<OIM, OIN>(
   value: LoopState$<OIM, OIN>,
 ): boolean;
-export function LoopState$LoopState$0<OIN, OIM>(value: LoopState$<OIM, OIN>): _.Result<
+export function LoopState$LoopState$0<OIM, OIN>(value: LoopState$<OIM, OIN>): _.Result<
   [$options.IpAddress$, number],
   undefined
 >;
-export function LoopState$LoopState$client_ip<OIN, OIM>(value: LoopState$<
+export function LoopState$LoopState$client_ip<OIM, OIN>(value: LoopState$<
     OIM,
     OIN
   >): _.Result<[$options.IpAddress$, number], undefined>;
-export function LoopState$LoopState$1<OIN, OIM>(value: LoopState$<OIM, OIN>): $socket.Socket$;
+export function LoopState$LoopState$1<OIM, OIN>(value: LoopState$<OIM, OIN>): $socket.Socket$;
 export function LoopState$LoopState$socket<OIM, OIN>(
   value: LoopState$<OIM, OIN>,
 ): $socket.Socket$;
@@ -132,7 +132,7 @@ export function LoopState$LoopState$sender<OIM, OIN>(value: LoopState$<OIM, OIN>
   Message$<any>
 >;
 export function LoopState$LoopState$3<OIM, OIN>(value: LoopState$<OIM, OIN>): $transport.Transport$;
-export function LoopState$LoopState$transport<OIN, OIM>(
+export function LoopState$LoopState$transport<OIM, OIN>(
   value: LoopState$<OIM, OIN>,
 ): $transport.Transport$;
 export function LoopState$LoopState$4<OIM, OIN>(value: LoopState$<OIM, OIN>): OIM;
@@ -140,7 +140,7 @@ export function LoopState$LoopState$state<OIM, OIN>(
   value: LoopState$<OIM, OIN>,
 ): OIM;
 
-export type LoopState$<OIM, OIN> = LoopState<OIN, OIM>;
+export type LoopState$<OIM, OIN> = LoopState<OIM, OIN>;
 
 export class Connection<OIO> extends _.CustomType {
   /** @deprecated */
@@ -191,7 +191,7 @@ export function Connection$Connection$sender<OIO>(value: Connection$<OIO>): $pro
 
 export type Connection$<OIO> = Connection<OIO>;
 
-export class Continue<OIQ, OIP> extends _.CustomType {
+export class Continue<OIP, OIQ> extends _.CustomType {
   /** @deprecated */
   constructor(state: OIP, selector: $option.Option$<$process.Selector$<any>>);
   /** @deprecated */
@@ -199,23 +199,23 @@ export class Continue<OIQ, OIP> extends _.CustomType {
   /** @deprecated */
   selector: $option.Option$<$process.Selector$<any>>;
 }
-export function Next$Continue<OIQ, OIP>(
+export function Next$Continue<OIP, OIQ>(
   state: OIP,
   selector: $option.Option$<$process.Selector$<any>>,
-): Next$<OIP, OIQ>;
-export function Next$isContinue<OIP, OIQ>(value: Next$<OIP, OIQ>): boolean;
-export function Next$Continue$0<OIQ, OIP>(value: Next$<OIP, OIQ>): OIP;
-export function Next$Continue$state<OIQ, OIP>(value: Next$<OIP, OIQ>): OIP;
-export function Next$Continue$1<OIP, OIQ>(value: Next$<OIP, OIQ>): $option.Option$<
+): Next$<OIQ, OIP>;
+export function Next$isContinue<OIQ, OIP>(value: Next$<OIQ, OIP>): boolean;
+export function Next$Continue$0<OIP, OIQ>(value: Next$<OIQ, OIP>): OIP;
+export function Next$Continue$state<OIP, OIQ>(value: Next$<OIQ, OIP>): OIP;
+export function Next$Continue$1<OIP, OIQ>(value: Next$<OIQ, OIP>): $option.Option$<
   $process.Selector$<any>
 >;
-export function Next$Continue$selector<OIP, OIQ>(value: Next$<OIP, OIQ>): $option.Option$<
+export function Next$Continue$selector<OIQ, OIP>(value: Next$<OIQ, OIP>): $option.Option$<
   $process.Selector$<any>
 >;
 
 export class NormalStop extends _.CustomType {}
-export function Next$NormalStop<OIP, OIQ>(): Next$<OIP, OIQ>;
-export function Next$isNormalStop<OIQ, OIP>(value: Next$<OIP, OIQ>): boolean;
+export function Next$NormalStop<OIQ, OIP>(): Next$<OIQ, OIP>;
+export function Next$isNormalStop<OIP, OIQ>(value: Next$<OIQ, OIP>): boolean;
 
 export class AbnormalStop extends _.CustomType {
   /** @deprecated */
@@ -223,14 +223,14 @@ export class AbnormalStop extends _.CustomType {
   /** @deprecated */
   reason: string;
 }
-export function Next$AbnormalStop<OIP, OIQ>(reason: string): Next$<OIP, OIQ>;
-export function Next$isAbnormalStop<OIP, OIQ>(value: Next$<OIP, OIQ>): boolean;
-export function Next$AbnormalStop$0<OIP, OIQ>(value: Next$<OIP, OIQ>): string;
-export function Next$AbnormalStop$reason<OIQ, OIP>(value: Next$<OIP, OIQ>): string;
+export function Next$AbnormalStop<OIQ, OIP>(reason: string): Next$<OIQ, OIP>;
+export function Next$isAbnormalStop<OIQ, OIP>(value: Next$<OIQ, OIP>): boolean;
+export function Next$AbnormalStop$0<OIP, OIQ>(value: Next$<OIQ, OIP>): string;
+export function Next$AbnormalStop$reason<OIQ, OIP>(value: Next$<OIQ, OIP>): string;
 
-export type Next$<OIP, OIQ> = Continue<OIP, OIQ> | NormalStop | AbnormalStop;
+export type Next$<OIQ, OIP> = Continue<OIQ, OIP> | NormalStop | AbnormalStop;
 
-export class Handler<OIS, OIR> extends _.CustomType {
+export class Handler<OIR, OIS> extends _.CustomType {
   /** @deprecated */
   constructor(
     socket: $socket.Socket$,
@@ -275,7 +275,7 @@ export function Handler$Handler<OIS, OIR>(
   on_close: $option.Option$<(x0: any) => undefined>,
   transport: $transport.Transport$,
 ): Handler$<OIR, OIS>;
-export function Handler$isHandler<OIR, OIS>(value: Handler$<OIR, OIS>): boolean;
+export function Handler$isHandler<OIS, OIR>(value: Handler$<OIR, OIS>): boolean;
 export function Handler$Handler$0<OIR, OIS>(value: Handler$<OIR, OIS>): $socket.Socket$;
 export function Handler$Handler$socket<OIS, OIR>(
   value: Handler$<OIR, OIS>,
@@ -285,18 +285,18 @@ export function Handler$Handler$1<OIR, OIS>(value: Handler$<OIR, OIS>): (
   x1: LoopMessage$<any>,
   x2: Connection$<any>
 ) => Next$<any, LoopMessage$<any>>;
-export function Handler$Handler$loop<OIR, OIS>(value: Handler$<OIR, OIS>): (
+export function Handler$Handler$loop<OIS, OIR>(value: Handler$<OIR, OIS>): (
   x0: any,
   x1: LoopMessage$<any>,
   x2: Connection$<any>
 ) => Next$<any, LoopMessage$<any>>;
-export function Handler$Handler$2<OIS, OIR>(value: Handler$<OIR, OIS>): (
+export function Handler$Handler$2<OIR, OIS>(value: Handler$<OIR, OIS>): (
   x0: Connection$<any>
 ) => [any, $option.Option$<$process.Selector$<any>>];
-export function Handler$Handler$on_init<OIR, OIS>(value: Handler$<OIR, OIS>): (
+export function Handler$Handler$on_init<OIS, OIR>(value: Handler$<OIR, OIS>): (
   x0: Connection$<any>
 ) => [any, $option.Option$<$process.Selector$<any>>];
-export function Handler$Handler$3<OIR, OIS>(value: Handler$<OIR, OIS>): $option.Option$<
+export function Handler$Handler$3<OIS, OIR>(value: Handler$<OIR, OIS>): $option.Option$<
   (x0: any) => undefined
 >;
 export function Handler$Handler$on_close<OIR, OIS>(value: Handler$<OIR, OIS>): $option.Option$<

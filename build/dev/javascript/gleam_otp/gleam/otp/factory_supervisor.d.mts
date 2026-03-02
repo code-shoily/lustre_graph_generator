@@ -21,11 +21,11 @@ declare class NamedSupervisor<HIQ, HIP> extends _.CustomType {
   name: $process.Name$<Message$<any, any>>;
 }
 
-export type Supervisor$<HIP, HIQ> = Supervisor | NamedSupervisor<HIQ, HIP>;
+export type Supervisor$<HIP, HIQ> = Supervisor | NamedSupervisor<HIP, HIQ>;
 
-export type Message$<HIS, HIR> = any;
+export type Message$<HIR, HIS> = any;
 
-declare class Builder<HIU, HIT> extends _.CustomType {
+declare class Builder<HIT, HIU> extends _.CustomType {
   /** @deprecated */
   constructor(
     child_type: $supervision.ChildType$,
@@ -49,18 +49,18 @@ declare class Builder<HIU, HIT> extends _.CustomType {
   name: $option.Option$<$process.Name$<Message$<any, any>>>;
 }
 
-export type Builder$<HIU, HIT> = Builder<HIT, HIU>;
+export type Builder$<HIT, HIU> = Builder<HIU, HIT>;
 
 type ErlangStartFlags$ = any;
 
-declare class Local<HIV, HIW> extends _.CustomType {
+declare class Local<HIW, HIV> extends _.CustomType {
   /** @deprecated */
   constructor(argument$0: $process.Name$<Message$<any, any>>);
   /** @deprecated */
   0: $process.Name$<Message$<any, any>>;
 }
 
-type ErlangSupervisorName$<HIV, HIW> = Local<HIV, HIW>;
+type ErlangSupervisorName$<HIW, HIV> = Local<HIW, HIV>;
 
 declare class SimpleOneForOne extends _.CustomType {}
 
@@ -98,7 +98,7 @@ declare class Id extends _.CustomType {
   0: number;
 }
 
-declare class Start<HIZ, HIY> extends _.CustomType {
+declare class Start<HIY, HIZ> extends _.CustomType {
   /** @deprecated */
   constructor(
     argument$0: [

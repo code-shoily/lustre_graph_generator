@@ -16,7 +16,7 @@ export class Builder<AMME, AMMD> extends _.CustomType {
   /** @deprecated */
   next_id: number;
 }
-export function Builder$Builder<AMMD, AMME>(
+export function Builder$Builder<AMME, AMMD>(
   graph: $model.Graph$<any, any>,
   label_to_id: $dict.Dict$<any, number>,
   next_id: number,
@@ -36,16 +36,16 @@ export function Builder$Builder$1<AMMD, AMME>(value: Builder$<AMMD, AMME>): $dic
   any,
   number
 >;
-export function Builder$Builder$label_to_id<AMMD, AMME>(value: Builder$<
+export function Builder$Builder$label_to_id<AMME, AMMD>(value: Builder$<
     AMMD,
     AMME
   >): $dict.Dict$<any, number>;
 export function Builder$Builder$2<AMMD, AMME>(value: Builder$<AMMD, AMME>): number;
-export function Builder$Builder$next_id<AMMD, AMME>(
+export function Builder$Builder$next_id<AMME, AMMD>(
   value: Builder$<AMMD, AMME>,
 ): number;
 
-export type Builder$<AMMD, AMME> = Builder<AMMD, AMME>;
+export type Builder$<AMMD, AMME> = Builder<AMME, AMMD>;
 
 export function new$(graph_type: $model.GraphType$): Builder$<any, any>;
 

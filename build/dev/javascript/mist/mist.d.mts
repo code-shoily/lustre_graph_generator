@@ -19,7 +19,7 @@ import type * as $http from "./mist/internal/http.d.mts";
 import type * as $next from "./mist/internal/next.d.mts";
 import type * as $websocket from "./mist/internal/websocket.d.mts";
 
-declare class Continue<ACKA, ACJZ> extends _.CustomType {
+declare class Continue<ACJZ, ACKA> extends _.CustomType {
   /** @deprecated */
   constructor(
     argument$0: ACJZ,
@@ -314,7 +314,7 @@ declare class CertKeyFiles extends _.CustomType {
 
 type TlsOptions$ = CertKeyFiles;
 
-declare class Builder<ACKB, ACKC> extends _.CustomType {
+declare class Builder<ACKC, ACKB> extends _.CustomType {
   /** @deprecated */
   constructor(
     port: number,
@@ -338,7 +338,7 @@ declare class Builder<ACKB, ACKC> extends _.CustomType {
   tls_options: $option.Option$<TlsOptions$>;
 }
 
-export type Builder$<ACKB, ACKC> = Builder<ACKB, ACKC>;
+export type Builder$<ACKC, ACKB> = Builder<ACKC, ACKB>;
 
 export class Assigned extends _.CustomType {}
 export function Port$Assigned(): Port$;

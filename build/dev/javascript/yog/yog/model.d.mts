@@ -35,8 +35,8 @@ export function Graph$Graph<ALDE, ALDF>(
   in_edges: $dict.Dict$<number, $dict.Dict$<number, any>>,
 ): Graph$<ALDF, ALDE>;
 export function Graph$isGraph<ALDF, ALDE>(value: Graph$<ALDF, ALDE>): boolean;
-export function Graph$Graph$0<ALDF, ALDE>(value: Graph$<ALDF, ALDE>): GraphType$;
-export function Graph$Graph$kind<ALDE, ALDF>(
+export function Graph$Graph$0<ALDE, ALDF>(value: Graph$<ALDF, ALDE>): GraphType$;
+export function Graph$Graph$kind<ALDF, ALDE>(
   value: Graph$<ALDF, ALDE>,
 ): GraphType$;
 export function Graph$Graph$1<ALDF, ALDE>(value: Graph$<ALDF, ALDE>): $dict.Dict$<
@@ -51,7 +51,7 @@ export function Graph$Graph$2<ALDF, ALDE>(value: Graph$<ALDF, ALDE>): $dict.Dict
   number,
   $dict.Dict$<number, any>
 >;
-export function Graph$Graph$out_edges<ALDF, ALDE>(value: Graph$<ALDF, ALDE>): $dict.Dict$<
+export function Graph$Graph$out_edges<ALDE, ALDF>(value: Graph$<ALDF, ALDE>): $dict.Dict$<
   number,
   $dict.Dict$<number, any>
 >;
@@ -64,7 +64,7 @@ export function Graph$Graph$in_edges<ALDE, ALDF>(value: Graph$<ALDF, ALDE>): $di
   $dict.Dict$<number, any>
 >;
 
-export type Graph$<ALDF, ALDE> = Graph<ALDF, ALDE>;
+export type Graph$<ALDF, ALDE> = Graph<ALDE, ALDF>;
 
 export type NodeId = number;
 
