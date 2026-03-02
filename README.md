@@ -89,4 +89,4 @@ Since this is a static Lustre application, you can easily host it on **GitHub Pa
    ```
 
 ---
-Built with ❤️ by [mafinar](https://github.com/mafinar)
+
