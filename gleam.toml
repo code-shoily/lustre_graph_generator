@@ -1,0 +1,17 @@
+name = "lustre_graph_generator"
+version = "1.0.0"
+target = "javascript"
+description = "Interactive graph generator using Yog and Lustre"
+
+[dependencies]
+gleam_stdlib = ">= 0.69.0 and < 2.0.0"
+yog = { path = "../yog" }
+lustre = ">= 5.6.0 and < 6.0.0"
+gleam_json = ">= 3.1.0 and < 4.0.0"
+
+[dev-dependencies]
+gleeunit = ">= 1.0.0 and < 2.0.0"
+lustre_dev_tools = ">= 2.3.4 and < 3.0.0"
+
+[javascript]
+typescript_declarations = true
