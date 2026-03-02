@@ -7,6 +7,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Checkout Yog
+        uses: actions/checkout@v4
+        with:
+          repository: 'mafinar/yog'
+          path: '../yog'
       - uses: erlef/setup-beam@v1
         with:
           otp-version: '27.2'
