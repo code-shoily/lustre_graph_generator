@@ -17,6 +17,7 @@ jobs:
           gleam-version: '1.14.0'
           rebar3-version: '3.24.0'
       - run: gleam run -m lustre/dev build app || gleam run -m lustre/dev build lustre_graph_generator
+      - run: rm -f .gitignore
       - uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
