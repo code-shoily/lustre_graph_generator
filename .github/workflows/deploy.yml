@@ -10,7 +10,7 @@ jobs:
       - uses: erlef/setup-beam@v1
         with:
           otp-version: '27.2'
-          gleam-version: '1.7.0'
+          gleam-version: '1.14.0'
       - run: gleam run -m lustre/dev build app || gleam run -m lustre/dev build lustre_graph_generator
       - uses: peaceiris/actions-gh-pages@v3
         with:
