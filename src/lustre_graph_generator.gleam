@@ -1,6 +1,7 @@
 import gleam/dict
 import gleam/float
 import gleam/int
+import gleam/list
 import gleam/option.{type Option, None, Some}
 import gleam/result
 import gleam/string
@@ -13,11 +14,14 @@ import lustre/event
 import yog/generators/classic
 import yog/generators/random
 import yog/model
+import yog/pathfinding
 import yog/render
+import yog/topological_sort
 
 pub type Tab {
   Json
   Mermaid
+  Dot
 }
 
 pub type Model {
@@ -33,6 +37,11 @@ pub type Model {
     depth: String,
     generated_json: String,
     mermaid_code: String,
+    dot_code: String,
+    csv_input: String,
+    analysis_source: String,
+    analysis_target: String,
+    analysis_result: Option(String),
     active_tab: Tab,
     validation_error: Option(String),
   )
@@ -54,6 +63,7 @@ pub type GraphType {
   BarabasiAlbert
   WattsStrogatz
   RandomTree
+  CSV
 }
 
 fn init(_flags) -> #(Model, effect.Effect(Msg)) {
@@ -70,6 +80,11 @@ fn init(_flags) -> #(Model, effect.Effect(Msg)) {
       depth: "3",
       generated_json: "",
       mermaid_code: "",
+      dot_code: "",
+      csv_input: "A, B, 1, Directed\nB, C, 2, Directed\nC, A, 3, Directed\nB, D, 1, Undirected",
+      analysis_source: "",
+      analysis_target: "",
+      analysis_result: None,
       active_tab: Json,
       validation_error: None,
     ),
@@ -94,7 +109,12 @@ pub type Msg {
   GenerateGraph
   CopyJson
   CopyMermaid
+  CopyDot
   SelectTab(Tab)
+  DownloadImage
+  UpdateCSV(String)
+  UpdateAnalysisSource(String)
+  UpdateAnalysisTarget(String)
 }
 
 fn update(m: Model, msg: Msg) -> #(Model, effect.Effect(Msg)) {
@@ -114,20 +134,70 @@ fn update(m: Model, msg: Msg) -> #(Model, effect.Effect(Msg)) {
     GenerateGraph -> {
       case validate_params(m) {
         Ok(_) -> {
-          let json = generate_graph_json(m) |> format_json
-          let mermaid = generate_mermaid_code(m)
-          #(
-            Model(
-              ..m,
-              generated_json: json,
-              mermaid_code: mermaid,
-              validation_error: None,
-            ),
-            effect.batch([
-              render_graph_effect(json),
-              render_mermaid_effect(mermaid),
-            ]),
-          )
+          let #(json, mermaid, dot, analysis_result) = case m.graph_type {
+            CSV -> {
+              case parse_csv_to_graph(m.csv_input) {
+                Ok(graph) -> {
+                  let analysis_result = run_graph_analysis(graph, m)
+                  let string_graph =
+                    model.Graph(
+                      kind: graph.kind,
+                      nodes: graph.nodes,
+                      out_edges: graph.out_edges
+                        |> dict.map_values(fn(_k, edges) {
+                          edges
+                          |> dict.map_values(fn(_k2, v2) { int.to_string(v2) })
+                        }),
+                      in_edges: graph.in_edges
+                        |> dict.map_values(fn(_k, edges) {
+                          edges
+                          |> dict.map_values(fn(_k2, v2) { int.to_string(v2) })
+                        }),
+                    )
+                  let json =
+                    render.to_json(string_graph, render.default_json_options())
+                    |> format_json
+                  let mermaid =
+                    render.to_mermaid(string_graph, render.default_options())
+                  let dot =
+                    render.to_dot(string_graph, render.default_dot_options())
+                  #(json, mermaid, dot, analysis_result)
+                }
+                Error(_) -> #("", "", "", None)
+              }
+            }
+            _ -> {
+              let json = generate_graph_json(m) |> format_json
+              let mermaid = generate_mermaid_code(m)
+              let dot = generate_dot_code(m)
+              #(json, mermaid, dot, None)
+            }
+          }
+
+          case json == "" && m.graph_type == CSV {
+            True -> {
+              let err = case parse_csv_to_graph(m.csv_input) {
+                Error(e) -> e
+                _ -> "Unknown CSV error"
+              }
+              #(Model(..m, validation_error: Some(err)), effect.none())
+            }
+            False -> #(
+              Model(
+                ..m,
+                generated_json: json,
+                mermaid_code: mermaid,
+                dot_code: dot,
+                analysis_result: analysis_result,
+                validation_error: None,
+              ),
+              effect.batch([
+                render_graph_effect(json),
+                render_mermaid_effect(mermaid),
+                render_dot_effect(dot),
+              ]),
+            )
+          }
         }
         Error(err) -> #(Model(..m, validation_error: Some(err)), effect.none())
       }
@@ -138,14 +208,106 @@ fn update(m: Model, msg: Msg) -> #(Model, effect.Effect(Msg)) {
     CopyMermaid -> {
       #(m, copy_to_clipboard_effect(m.mermaid_code))
     }
+    CopyDot -> {
+      #(m, copy_to_clipboard_effect(m.dot_code))
+    }
     SelectTab(tab) -> {
       let m = Model(..m, active_tab: tab)
       let eff = case tab {
         Json -> render_graph_effect(m.generated_json)
         Mermaid -> render_mermaid_effect(m.mermaid_code)
+        Dot -> render_dot_effect(m.dot_code)
       }
       #(m, eff)
     }
+    DownloadImage -> {
+      #(m, download_image_effect(m.active_tab))
+    }
+    UpdateCSV(value) -> {
+      let m = Model(..m, csv_input: value)
+      case m.graph_type {
+        CSV -> update(m, GenerateGraph)
+        _ -> #(m, effect.none())
+      }
+    }
+    UpdateAnalysisSource(value) -> {
+      let m = Model(..m, analysis_source: value)
+      update(m, GenerateGraph)
+    }
+    UpdateAnalysisTarget(value) -> {
+      let m = Model(..m, analysis_target: value)
+      update(m, GenerateGraph)
+    }
+  }
+}
+
+fn find_node_id_by_label(
+  graph: model.Graph(String, w),
+  label: String,
+) -> Result(Int, Nil) {
+  graph.nodes
+  |> dict.to_list
+  |> list.find(fn(n) { n.1 == label })
+  |> result.map(fn(n) { n.0 })
+}
+
+fn run_graph_analysis(
+  graph: model.Graph(String, Int),
+  m: Model,
+) -> Option(String) {
+  let shortest_path_msg = case
+    find_node_id_by_label(graph, m.analysis_source),
+    find_node_id_by_label(graph, m.analysis_target)
+  {
+    Ok(src), Ok(dst) -> {
+      case pathfinding.shortest_path(graph, src, dst, 0, int.add, int.compare) {
+        Some(path) -> {
+          let path_labels =
+            path.nodes
+            |> list.map(fn(id) {
+              dict.get(graph.nodes, id) |> result.unwrap(int.to_string(id))
+            })
+            |> string.join(" → ")
+
+          "📍 Shortest Path: "
+          <> path_labels
+          <> " (Total Weight: "
+          <> int.to_string(path.total_weight)
+          <> ")"
+        }
+        None ->
+          "🚫 No path found from "
+          <> m.analysis_source
+          <> " to "
+          <> m.analysis_target
+      }
+    }
+    _, _ -> {
+      case
+        string.is_empty(m.analysis_source) || string.is_empty(m.analysis_target)
+      {
+        True -> ""
+        False -> "⚠️ Enter valid node labels (e.g., A, B) to find shortest path."
+      }
+    }
+  }
+
+  let topo_msg = case topological_sort.topological_sort(graph) {
+    Ok(sorted_ids) -> {
+      let sorted_labels =
+        sorted_ids
+        |> list.map(fn(id) {
+          dict.get(graph.nodes, id) |> result.unwrap(int.to_string(id))
+        })
+        |> string.join(", ")
+      "📐 Topological Sort: " <> sorted_labels
+    }
+    Error(_) -> "🔄 Graph has cycles, topological sort not possible."
+  }
+
+  case shortest_path_msg, topo_msg {
+    "", tm -> Some(tm)
+    sm, tm -> Some(sm <> "\n\n" <> tm)
   }
 }
 
@@ -181,7 +343,114 @@ fn validate_params(model: Model) -> Result(Nil, String) {
         False -> Ok(Nil)
       }
     }
+    CSV -> {
+      case parse_csv_to_graph(model.csv_input) {
+        Ok(_) -> Ok(Nil)
+        Error(err) -> Error(err)
+      }
+    }
     _ -> Ok(Nil)
+  }
+}
+
+fn parse_csv_to_graph(input: String) -> Result(model.Graph(String, Int), String) {
+  let lines =
+    string.split(input, "\n")
+    |> list.filter(fn(l) { !string.is_empty(string.trim(l)) })
+
+  let result =
+    lines
+    |> list.index_fold(Ok(#(dict.new(), [], 0)), fn(acc, line, idx) {
+      case acc {
+        Error(e) -> Error(e)
+        Ok(#(label_map, edges, next_id)) -> {
+          let parts = string.split(line, ",") |> list.map(string.trim)
+          case parts {
+            [from_label, to_label, weight_str, ..] -> {
+              let weight_res = int.parse(weight_str)
+              case weight_res {
+                Ok(w) -> {
+                  let #(label_map, from_id, next_id) = case
+                    dict.get(label_map, from_label)
+                  {
+                    Ok(id) -> #(label_map, id, next_id)
+                    Error(_) -> #(
+                      dict.insert(label_map, from_label, next_id),
+                      next_id,
+                      next_id + 1,
+                    )
+                  }
+                  let #(label_map, to_id, next_id) = case
+                    dict.get(label_map, to_label)
+                  {
+                    Ok(id) -> #(label_map, id, next_id)
+                    Error(_) -> #(
+                      dict.insert(label_map, to_label, next_id),
+                      next_id,
+                      next_id + 1,
+                    )
+                  }
+                  Ok(#(label_map, [#(from_id, to_id, w), ..edges], next_id))
+                }
+                Error(_) ->
+                  Error(
+                    "Line "
+                    <> int.to_string(idx + 1)
+                    <> ": Invalid weight '"
+                    <> weight_str
+                    <> "'",
+                  )
+              }
+            }
+            [from_label, to_label] -> {
+              let #(label_map, from_id, next_id) = case
+                dict.get(label_map, from_label)
+              {
+                Ok(id) -> #(label_map, id, next_id)
+                Error(_) -> #(
+                  dict.insert(label_map, from_label, next_id),
+                  next_id,
+                  next_id + 1,
+                )
+              }
+              let #(label_map, to_id, next_id) = case
+                dict.get(label_map, to_label)
+              {
+                Ok(id) -> #(label_map, id, next_id)
+                Error(_) -> #(
+                  dict.insert(label_map, to_label, next_id),
+                  next_id,
+                  next_id + 1,
+                )
+              }
+              Ok(#(label_map, [#(from_id, to_id, 1), ..edges], next_id))
+            }
+            _ ->
+              Error(
+                "Line "
+                <> int.to_string(idx + 1)
+                <> ": Invalid format. Use 'From, To, Weight'",
+              )
+          }
+        }
+      }
+    })
+
+  case result {
+    Ok(#(label_map, edges, _)) -> {
+      let g = model.new(model.Directed)
+      let g =
+        dict.fold(label_map, g, fn(acc, label, id) {
+          model.add_node(acc, id, label)
+        })
+      let g =
+        list.fold(edges, g, fn(acc, e) {
+          let #(from, to, w) = e
+          model.add_edge(acc, from, to, w)
+        })
+      Ok(g)
+    }
+    Error(err) -> Error(err)
   }
 }
 
@@ -206,8 +475,22 @@ fn render_mermaid_effect(mermaid: String) -> effect.Effect(Msg) {
   effect.from(fn(_dispatch) { render_mermaid_js(mermaid) })
 }
 
+@external(javascript, "./graph_ffi.mjs", "renderDot")
+fn render_dot_js(dot: String) -> Nil
+
+fn render_dot_effect(dot: String) -> effect.Effect(Msg) {
+  effect.from(fn(_dispatch) { render_dot_js(dot) })
+}
+
 @external(javascript, "./graph_ffi.mjs", "formatJSON")
 fn format_json(json: String) -> String
+
+@external(javascript, "./graph_ffi.mjs", "downloadImage")
+fn download_image_js(tab: Tab) -> Nil
+
+fn download_image_effect(tab: Tab) -> effect.Effect(Msg) {
+  effect.from(fn(_dispatch) { download_image_js(tab) })
+}
 
 fn generate_mermaid_code(model: Model) -> String {
   let graph = case model.graph_type {
@@ -275,6 +558,7 @@ fn generate_mermaid_code(model: Model) -> String {
       let n = int.parse(model.nodes) |> result.unwrap(10) |> int.max(1)
       random.random_tree(n)
     }
+    CSV -> model.new(model.Directed)
   }
 
   let string_graph =
@@ -328,9 +612,7 @@ fn view(model: Model) -> Element(Msg) {
                     "text-4xl font-extrabold mb-2 text-white leading-tight",
                   ),
                 ],
-                [
-                  element.text("🎨 Yog Graph Generator"),
-                ],
+                [element.text("🎨 Yog Graph Playground")],
               ),
               html.p([attribute.class("text-slate-400 mb-8 font-medium")], [
                 element.text(
@@ -364,6 +646,7 @@ fn view(model: Model) -> Element(Msg) {
                       "BarabasiAlbert" -> SelectGraphType(BarabasiAlbert)
                       "WattsStrogatz" -> SelectGraphType(WattsStrogatz)
                       "RandomTree" -> SelectGraphType(RandomTree)
+                      "CSV" -> SelectGraphType(CSV)
                       _ -> SelectGraphType(ErdosRenyiGnp)
                     }
                   }),
@@ -386,6 +669,7 @@ fn view(model: Model) -> Element(Msg) {
                     BarabasiAlbert -> "BarabasiAlbert"
                     WattsStrogatz -> "WattsStrogatz"
                     RandomTree -> "RandomTree"
+                    CSV -> "CSV"
                   }),
                 ],
                 [
@@ -416,6 +700,7 @@ fn view(model: Model) -> Element(Msg) {
                     "🌐 Small-world (WS)",
                   ),
                   html.option([attribute.value("RandomTree")], "🎋 Random Tree"),
+                  html.option([attribute.value("CSV")], "📊 CSV (Experimental)"),
                 ],
               ),
               html.h3(
@@ -471,6 +756,7 @@ fn view(model: Model) -> Element(Msg) {
                 [
                   tab_button("JSON", Json, model.active_tab == Json),
                   tab_button("Mermaid", Mermaid, model.active_tab == Mermaid),
+                  tab_button("DOT", Dot, model.active_tab == Dot),
                 ],
               ),
               html.div([], [
@@ -497,15 +783,26 @@ fn view(model: Model) -> Element(Msg) {
                           case model.generated_json {
                             "" -> element.none()
                             _ ->
-                              html.button(
-                                [
-                                  attribute.class(
-                                    "bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] px-3 py-1.5 rounded font-semibold transition-colors",
-                                  ),
-                                  event.on_click(CopyJson),
-                                ],
-                                [element.text("📋 Copy")],
-                              )
+                              html.div([attribute.class("flex gap-2")], [
+                                html.button(
+                                  [
+                                    attribute.class(
+                                      "bg-sky-600 hover:bg-sky-700 text-white text-[10px] px-3 py-1.5 rounded font-semibold transition-colors",
+                                    ),
+                                    event.on_click(DownloadImage),
+                                  ],
+                                  [element.text("💾 Download")],
+                                ),
+                                html.button(
+                                  [
+                                    attribute.class(
+                                      "bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] px-3 py-1.5 rounded font-semibold transition-colors",
+                                    ),
+                                    event.on_click(CopyJson),
+                                  ],
+                                  [element.text("📋 Copy")],
+                                ),
+                              ])
                           },
                         ],
                       ),
@@ -551,19 +848,95 @@ fn view(model: Model) -> Element(Msg) {
                           case model.mermaid_code {
                             "" -> element.none()
                             _ ->
-                              html.button(
-                                [
-                                  attribute.class(
-                                    "bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] px-3 py-1.5 rounded font-semibold transition-colors",
-                                  ),
-                                  event.on_click(CopyMermaid),
-                                ],
-                                [element.text("📋 Copy")],
-                              )
+                              html.div([attribute.class("flex gap-2")], [
+                                html.button(
+                                  [
+                                    attribute.class(
+                                      "bg-sky-600 hover:bg-sky-700 text-white text-[10px] px-3 py-1.5 rounded font-semibold transition-colors",
+                                    ),
+                                    event.on_click(DownloadImage),
+                                  ],
+                                  [element.text("💾 Download")],
+                                ),
+                                html.button(
+                                  [
+                                    attribute.class(
+                                      "bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] px-3 py-1.5 rounded font-semibold transition-colors",
+                                    ),
+                                    event.on_click(CopyMermaid),
+                                  ],
+                                  [element.text("📋 Copy")],
+                                ),
+                              ])
                           },
                         ],
                       ),
                       case model.mermaid_code {
+                        "" ->
+                          html.p(
+                            [attribute.class("text-slate-400 mb-8 font-medium")],
+                            [
+                              element.text("Click 'Generate' to see definition"),
+                            ],
+                          )
+                        code ->
+                          html.pre(
+                            [
+                              attribute.class(
+                                "bg-slate-900 p-6 rounded border border-white/10 overflow-x-auto h-[480px] text-[13px] font-mono text-sky-400",
+                              ),
+                            ],
+                            [element.text(code)],
+                          )
+                      },
+                    ])
+                  }
+                  Dot -> {
+                    html.div([], [
+                      html.div(
+                        [
+                          attribute.class(
+                            "flex justify-between items-center mb-2",
+                          ),
+                        ],
+                        [
+                          html.h3(
+                            [
+                              attribute.class(
+                                "text-slate-400 text-[10px] font-bold uppercase tracking-widest m-0",
+                              ),
+                            ],
+                            [
+                              element.text("DOT Definition"),
+                            ],
+                          ),
+                          case model.dot_code {
+                            "" -> element.none()
+                            _ ->
+                              html.div([attribute.class("flex gap-2")], [
+                                html.button(
+                                  [
+                                    attribute.class(
+                                      "bg-sky-600 hover:bg-sky-700 text-white text-[10px] px-3 py-1.5 rounded font-semibold transition-colors",
+                                    ),
+                                    event.on_click(DownloadImage),
+                                  ],
+                                  [element.text("💾 Download")],
+                                ),
+                                html.button(
+                                  [
+                                    attribute.class(
+                                      "bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] px-3 py-1.5 rounded font-semibold transition-colors",
+                                    ),
+                                    event.on_click(CopyDot),
+                                  ],
+                                  [element.text("📋 Copy")],
+                                ),
+                              ])
+                          },
+                        ],
+                      ),
+                      case model.dot_code {
                         "" ->
                           html.p(
                             [attribute.class("text-slate-400 mb-8 font-medium")],
@@ -600,6 +973,7 @@ fn view(model: Model) -> Element(Msg) {
               element.text(case model.active_tab {
                 Json -> "Cytoscape Visualization"
                 Mermaid -> "Mermaid Diagram"
+                Dot -> "Graphviz Visualization"
               }),
             ],
           ),
@@ -609,7 +983,7 @@ fn view(model: Model) -> Element(Msg) {
               attribute.class(case model.active_tab {
                 Json ->
                   "w-full h-[600px] bg-slate-900/40 border border-white/10 rounded mt-4"
-                Mermaid -> "hidden"
+                _ -> "hidden"
               }),
             ],
             [],
@@ -620,7 +994,18 @@ fn view(model: Model) -> Element(Msg) {
               attribute.class(case model.active_tab {
                 Mermaid ->
                   "w-full min-h-[400px] bg-white p-8 rounded flex justify-center overflow-auto mt-4"
-                Json -> "hidden"
+                _ -> "hidden"
+              }),
+            ],
+            [],
+          ),
+          html.div(
+            [
+              attribute.id("dot-graph"),
+              attribute.class(case model.active_tab {
+                Dot ->
+                  "w-full min-h-[400px] bg-white p-8 rounded flex justify-center overflow-auto mt-4"
+                _ -> "hidden"
               }),
             ],
             [],
@@ -679,6 +1064,66 @@ fn parameters_form(model: Model) -> Element(Msg) {
       input_field("Nodes", model.nodes, UpdateNodes, "number", "1"),
       input_field("Neighbors (K)", model.k, UpdateK, "number", "2"),
       input_field("Rewiring Prob (P)", model.p, UpdateP, "number", "0.01"),
+    ]
+    CSV -> [
+      html.div([attribute.class("mb-4")], [
+        html.label(
+          [
+            attribute.class(
+              "block text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-1",
+            ),
+          ],
+          [element.text("CSV Input (From, To, Weight)")],
+        ),
+        html.textarea(
+          [
+            attribute.class(
+              "w-full h-40 bg-slate-900 p-4 rounded border border-white/10 text-[13px] font-mono text-sky-400 focus:outline-none focus:border-sky-500/50 transition-colors resize-none",
+            ),
+            attribute.value(model.csv_input),
+            event.on_input(UpdateCSV),
+            attribute.attribute("maxlength", "5000"),
+            attribute.attribute("placeholder", "A, B, 1\nB, C, 2"),
+          ],
+          "",
+        ),
+      ]),
+      html.h3(
+        [
+          attribute.class(
+            "text-slate-400 text-[10px] mt-6 mb-3 font-bold uppercase tracking-widest",
+          ),
+        ],
+        [element.text("Graph Analysis")],
+      ),
+      html.div([attribute.class("grid grid-cols-2 gap-4 mb-4")], [
+        input_field(
+          "Source Node",
+          model.analysis_source,
+          UpdateAnalysisSource,
+          "text",
+          "",
+        ),
+        input_field(
+          "Target Node",
+          model.analysis_target,
+          UpdateAnalysisTarget,
+          "text",
+          "",
+        ),
+      ]),
+      case model.analysis_result {
+        Some(result) ->
+          html.div(
+            [
+              attribute.class(
+                "p-4 bg-sky-500/5 border border-sky-500/20 rounded text-[13px] font-medium text-sky-300 whitespace-pre-wrap leading-relaxed shadow-inner",
+              ),
+            ],
+            [element.text(result)],
+          )
+        None -> element.none()
+      },
     ]
   })
 }
@@ -779,6 +1224,7 @@ fn generate_graph_json(model: Model) -> String {
       let n = int.parse(model.nodes) |> result.unwrap(10) |> int.max(1)
       random.random_tree(n)
     }
+    CSV -> model.new(model.Directed)
   }
 
   // Convert to string graph for JSON rendering
@@ -803,6 +1249,98 @@ fn generate_graph_json(model: Model) -> String {
     )
 
   render.to_json(string_graph, render.default_json_options())
+}
+
+fn generate_dot_code(model: Model) -> String {
+  let graph = case model.graph_type {
+    Complete -> {
+      let n = int.parse(model.nodes) |> result.unwrap(5) |> int.max(1)
+      classic.complete(n)
+    }
+    Cycle -> {
+      let n = int.parse(model.nodes) |> result.unwrap(10) |> int.max(3)
+      classic.cycle(n)
+    }
+    Path -> {
+      let n = int.parse(model.nodes) |> result.unwrap(10) |> int.max(1)
+      classic.path(n)
+    }
+    Star -> {
+      let n = int.parse(model.nodes) |> result.unwrap(10) |> int.max(1)
+      classic.star(n)
+    }
+    Wheel -> {
+      let n = int.parse(model.nodes) |> result.unwrap(10) |> int.max(4)
+      classic.wheel(n)
+    }
+    Bipartite -> {
+      let m = int.parse(model.width) |> result.unwrap(3) |> int.max(1)
+      let n = int.parse(model.height) |> result.unwrap(3) |> int.max(1)
+      classic.complete_bipartite(m, n)
+    }
+    Empty -> {
+      let n = int.parse(model.nodes) |> result.unwrap(10) |> int.max(0)
+      classic.empty(n)
+    }
+    BinaryTree -> {
+      let d = int.parse(model.depth) |> result.unwrap(3) |> int.max(0)
+      classic.binary_tree(d)
+    }
+    Grid2D -> {
+      let r = int.parse(model.height) |> result.unwrap(5) |> int.max(1)
+      let c = int.parse(model.width) |> result.unwrap(5) |> int.max(1)
+      classic.grid_2d(r, c)
+    }
+    Petersen -> classic.petersen()
+    ErdosRenyiGnp -> {
+      let n = int.parse(model.nodes) |> result.unwrap(10) |> int.max(1)
+      let p = float.parse(model.density) |> result.unwrap(0.3)
+      random.erdos_renyi_gnp(n, p)
+    }
+    ErdosRenyiGnm -> {
+      let n = int.parse(model.nodes) |> result.unwrap(10) |> int.max(1)
+      let m = int.parse(model.m) |> result.unwrap(10) |> int.max(0)
+      random.erdos_renyi_gnm(n, m)
+    }
+    BarabasiAlbert -> {
+      let n = int.parse(model.nodes) |> result.unwrap(10) |> int.max(2)
+      let m = int.parse(model.m) |> result.unwrap(1) |> int.max(1)
+      random.barabasi_albert(n, m)
+    }
+    WattsStrogatz -> {
+      let n = int.parse(model.nodes) |> result.unwrap(10) |> int.max(3)
+      let k = int.parse(model.k) |> result.unwrap(4) |> int.max(2)
+      let p = float.parse(model.p) |> result.unwrap(0.1)
+      random.watts_strogatz(n, k, p)
+    }
+    RandomTree -> {
+      let n = int.parse(model.nodes) |> result.unwrap(10) |> int.max(1)
+      random.random_tree(n)
+    }
+    CSV -> model.new(model.Directed)
+  }
+
+  let string_graph =
+    model.Graph(
+      kind: graph.kind,
+      nodes: graph.nodes
+        |> dict.map_values(fn(_k, v) {
+          case string.is_empty(string.inspect(v)) {
+            True -> "node"
+            False -> string.inspect(v) |> string.replace("\"", "")
+          }
+        }),
+      out_edges: graph.out_edges
+        |> dict.map_values(fn(_k, edges) {
+          edges |> dict.map_values(fn(_k2, v2) { int.to_string(v2) })
+        }),
+      in_edges: graph.in_edges
+        |> dict.map_values(fn(_k, edges) {
+          edges |> dict.map_values(fn(_k2, v2) { int.to_string(v2) })
+        }),
+    )
+
+  render.to_dot(string_graph, render.default_dot_options())
 }
 
 // =============================================================================

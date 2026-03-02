@@ -79,13 +79,16 @@ export function renderGraph(jsonString) {
         cols: Math.max(...data.nodes.map(n => parseInt(n.label?.split(':')[0]?.split(' ')[1] || 0))) + 1,
         padding: 50
       } : {
-        name: 'cose',
-        animate: true,
+        name: 'fcose',
+        animate: data.nodes.length < 100,
         animationDuration: 500,
         padding: 50,
-        randomize: false,
-        nodeRepulsion: 4000,
-        idealEdgeLength: 50
+        randomize: true,
+        nodeRepulsion: 4500,
+        idealEdgeLength: 50,
+        sampleSize: 100,
+        nodeDimensionsIncludeLabels: true,
+        uniformNodeDimensions: true
       }
     });
 
@@ -141,5 +144,95 @@ export function renderMermaid(code) {
   } catch (e) {
     console.error("Mermaid catch error:", e);
     container.innerHTML = `<p style="color: #ef4444; padding: 1rem;">Mermaid Error: ${e.message}</p>`;
+  }
+}
+
+let graphvizInstance = null;
+
+export async function renderDot(code) {
+  const container = document.getElementById('dot-graph');
+  if (!container) return;
+
+  if (!code) {
+    container.innerHTML = "";
+    return;
+  }
+
+  try {
+    if (!graphvizInstance) {
+      console.log('Loading Graphviz WASM module...');
+      const hpcc = await import("https://cdn.jsdelivr.net/npm/@hpcc-js/wasm/dist/graphviz.js");
+      graphvizInstance = await hpcc.Graphviz.load();
+      console.log('Graphviz WASM module loaded');
+    }
+
+    const svg = graphvizInstance.layout(code, "svg", "dot");
+    container.innerHTML = svg;
+
+    const svgElement = container.querySelector('svg');
+    if (svgElement) {
+      svgElement.style.width = "100%";
+      svgElement.style.height = "auto";
+      svgElement.style.maxWidth = "100%";
+    }
+  } catch (err) {
+    console.error("DOT render error:", err);
+    container.innerHTML = `<p style="color: #ef4444; padding: 1rem;">DOT Error: ${err.message || 'Check syntax'}</p>`;
+  }
+}
+
+export function downloadImage(tabType) {
+  const isJson = tabType.constructor.name === 'Json';
+  const isMermaid = tabType.constructor.name === 'Mermaid';
+  const isDot = tabType.constructor.name === 'Dot';
+
+  if (isJson) {
+    if (!cy) return;
+    try {
+      // Export Cytoscape as PNG
+      const b64 = cy.png({ full: true, bg: '#0f172a', scale: 2 });
+      const link = document.createElement('a');
+      link.href = b64;
+      link.download = 'graph.png';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      console.error("PNG export error:", err);
+    }
+  } else if (isMermaid || isDot) {
+    const containerId = isMermaid ? 'mermaid-graph' : 'dot-graph';
+    const svg = document.querySelector(`#${containerId} svg`);
+
+    if (!svg) {
+      console.error('SVG not found for export');
+      return;
+    }
+
+    try {
+      // Export SVG for Mermaid/DOT
+      const serializer = new XMLSerializer();
+      let source = serializer.serializeToString(svg);
+
+      // Ensure namespaces are present
+      if (!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
+        source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+      }
+      if (!source.match(/^<svg[^>]+xmlns\:xlink="http\:\/\/www\.w3\.org\/1999\/xlink"/)) {
+        source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+      }
+
+      const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `graph-${isMermaid ? 'mermaid' : 'dot'}.svg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 100);
+    } catch (err) {
+      console.error("SVG export error:", err);
+    }
   }
 }
