@@ -24,54 +24,44 @@ gleam add lustre_graph_generator
 
 ## 🏃 Running the Application
 
-This is a **Lustre web application**. You can run it locally using several methods:
+This is a modern Vite application powering a Gleam/Lustre frontend. 
 
-### Method A: Lustre Dev Tools (Recommended)
-You can use the built-in development server provided by `lustre_dev_tools`:
-
-```sh
-gleam run -m lustre/dev start
-```
-
-### Method B: Simple Static Server
-If you're having environment issues with `rebar3` or prefer a simple setup:
-
-1. **Build the project**:
+1. **Install JavaScript dependencies (Vite, Tailwind CLI, etc.)**:
    ```sh
-   gleam build
+   npm install
    ```
 
-2. **Serve from a local server**:
+2. **Run the local development server**:
    ```sh
-   # Using Python
-   python3 -m http.server 8000
-   
-   # Or using Node.js
-   npx serve .
+   npm run dev
    ```
 
-3. **Open in Browser**: Navigate to [http://localhost:8000](http://localhost:8000).
+3. **Open in Browser**: Navigate to [http://localhost:8000](http://localhost:8000). The development server provides instant Hot Module Replacement (HMR) for both your Gleam code and Tailwind CSS.
 
 ## 🌐 Deployment
 
-Since this is a static Lustre application, you can easily host it on **GitHub Pages**, **Vercel**, or **Netlify**.
+Since this is a statically built application, you can easily host it on **GitHub Pages**, **Vercel**, or **Netlify**.
 
-### Deploying to GitHub Pages
+### Building for Production
 
 1. **Build the production bundle**:
    ```sh
-   gleam build
+   npm run build
    ```
 
-2. **Structure**: Ensure your `index.html` is at the root and the `build/` directory is included in your repository (or generated via GitHub Actions).
+2. **Structure**: The build process will output highly optimized, minified HTML, CSS, and JS into the `dist/` directory.
 
-3. **GitHub Actions (Recommended)**:
+### Deploying to GitHub Pages
+
+1. **GitHub Actions (Recommended)**:
    Create `.github/workflows/deploy.yml` to automate the build and deployment:
    ```yaml
    name: Deploy to GitHub Pages
    on:
      push:
        branches: [main]
+   permissions:
+     contents: write
    jobs:
      build:
        runs-on: ubuntu-latest
@@ -80,12 +70,14 @@ Since this is a static Lustre application, you can easily host it on **GitHub Pa
          - uses: erlef/setup-beam@v1
            with:
              otp-version: '27.2'
-             gleam-version: '1.7.0'
-         - run: gleam build
+             gleam-version: '1.14.0'
+             rebar3-version: '3.24.0'
+         - run: npm ci
+         - run: npm run build
          - uses: peaceiris/actions-gh-pages@v3
            with:
              github_token: ${{ secrets.GITHUB_TOKEN }}
-             publish_dir: .
+             publish_dir: ./dist
    ```
 
 ---
