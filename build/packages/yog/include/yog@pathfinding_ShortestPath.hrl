@@ -1,0 +1,1 @@
+-record(shortest_path, {path :: yog@pathfinding:path(any())}).

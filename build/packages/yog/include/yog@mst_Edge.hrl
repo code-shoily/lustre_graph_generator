@@ -1,0 +1,1 @@
+-record(edge, {from :: integer(), to :: integer(), weight :: any()}).

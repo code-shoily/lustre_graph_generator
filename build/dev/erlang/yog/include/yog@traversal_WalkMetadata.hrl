@@ -1,0 +1,1 @@
+-record(walk_metadata, {depth :: integer(), parent :: gleam@option:option(any())}).

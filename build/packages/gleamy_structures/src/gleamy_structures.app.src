@@ -1,0 +1,16 @@
+{application, gleamy_structures, [
+    {vsn, "1.2.0"},
+    {applications, [gleam_stdlib]},
+    {description, "Data structures in pure Gleam! Including tree, heap, non empty list, map, set, and priority queue."},
+    {modules, [gleamy@bimap,
+               gleamy@leftist_heap,
+               gleamy@map,
+               gleamy@non_empty_list,
+               gleamy@pairing_heap,
+               gleamy@priority_queue,
+               gleamy@red_black_tree_map,
+               gleamy@red_black_tree_set,
+               gleamy@set,
+               gleamy_structures@@main]},
+    {registered, []}
+]}.
