@@ -33,38 +33,38 @@ export function Graph$Graph<ALDE, ALDF>(
   nodes: $dict.Dict$<number, any>,
   out_edges: $dict.Dict$<number, $dict.Dict$<number, any>>,
   in_edges: $dict.Dict$<number, $dict.Dict$<number, any>>,
-): Graph$<ALDE, ALDF>;
-export function Graph$isGraph<ALDF, ALDE>(value: Graph$<ALDE, ALDF>): boolean;
-export function Graph$Graph$0<ALDE, ALDF>(value: Graph$<ALDE, ALDF>): GraphType$;
-export function Graph$Graph$kind<ALDF, ALDE>(
-  value: Graph$<ALDE, ALDF>,
+): Graph$<ALDF, ALDE>;
+export function Graph$isGraph<ALDF, ALDE>(value: Graph$<ALDF, ALDE>): boolean;
+export function Graph$Graph$0<ALDF, ALDE>(value: Graph$<ALDF, ALDE>): GraphType$;
+export function Graph$Graph$kind<ALDE, ALDF>(
+  value: Graph$<ALDF, ALDE>,
 ): GraphType$;
-export function Graph$Graph$1<ALDE, ALDF>(value: Graph$<ALDE, ALDF>): $dict.Dict$<
+export function Graph$Graph$1<ALDF, ALDE>(value: Graph$<ALDF, ALDE>): $dict.Dict$<
   number,
   any
 >;
-export function Graph$Graph$nodes<ALDE, ALDF>(value: Graph$<ALDE, ALDF>): $dict.Dict$<
+export function Graph$Graph$nodes<ALDF, ALDE>(value: Graph$<ALDF, ALDE>): $dict.Dict$<
   number,
   any
 >;
-export function Graph$Graph$2<ALDF, ALDE>(value: Graph$<ALDE, ALDF>): $dict.Dict$<
+export function Graph$Graph$2<ALDF, ALDE>(value: Graph$<ALDF, ALDE>): $dict.Dict$<
   number,
   $dict.Dict$<number, any>
 >;
-export function Graph$Graph$out_edges<ALDF, ALDE>(value: Graph$<ALDE, ALDF>): $dict.Dict$<
+export function Graph$Graph$out_edges<ALDF, ALDE>(value: Graph$<ALDF, ALDE>): $dict.Dict$<
   number,
   $dict.Dict$<number, any>
 >;
-export function Graph$Graph$3<ALDF, ALDE>(value: Graph$<ALDE, ALDF>): $dict.Dict$<
+export function Graph$Graph$3<ALDE, ALDF>(value: Graph$<ALDF, ALDE>): $dict.Dict$<
   number,
   $dict.Dict$<number, any>
 >;
-export function Graph$Graph$in_edges<ALDE, ALDF>(value: Graph$<ALDE, ALDF>): $dict.Dict$<
+export function Graph$Graph$in_edges<ALDE, ALDF>(value: Graph$<ALDF, ALDE>): $dict.Dict$<
   number,
   $dict.Dict$<number, any>
 >;
 
-export type Graph$<ALDE, ALDF> = Graph<ALDE, ALDF>;
+export type Graph$<ALDF, ALDE> = Graph<ALDF, ALDE>;
 
 export type NodeId = number;
 

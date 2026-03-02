@@ -10,7 +10,7 @@ declare class Bimap<JOX, JOY> extends _.CustomType {
   to_key: $dict.Dict$<any, any>;
 }
 
-export type Bimap$<JOY, JOX> = Bimap<JOY, JOX>;
+export type Bimap$<JOY, JOX> = Bimap<JOX, JOY>;
 
 export function new$(): Bimap$<any, any>;
 

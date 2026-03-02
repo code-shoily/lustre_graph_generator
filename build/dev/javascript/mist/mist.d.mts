@@ -40,7 +40,7 @@ declare class AbnormalStop extends _.CustomType {
   reason: string;
 }
 
-export type Next$<ACKA, ACJZ> = Continue<ACJZ, ACKA> | NormalStop | AbnormalStop;
+export type Next$<ACKA, ACJZ> = Continue<ACKA, ACJZ> | NormalStop | AbnormalStop;
 
 export class IpV4 extends _.CustomType {
   /** @deprecated */
@@ -314,7 +314,7 @@ declare class CertKeyFiles extends _.CustomType {
 
 type TlsOptions$ = CertKeyFiles;
 
-declare class Builder<ACKC, ACKB> extends _.CustomType {
+declare class Builder<ACKB, ACKC> extends _.CustomType {
   /** @deprecated */
   constructor(
     port: number,

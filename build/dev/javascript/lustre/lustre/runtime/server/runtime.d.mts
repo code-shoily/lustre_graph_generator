@@ -11,7 +11,7 @@ import type * as $transport from "../../../lustre/runtime/transport.d.mts";
 import type * as $cache from "../../../lustre/vdom/cache.d.mts";
 import type * as $vnode from "../../../lustre/vdom/vnode.d.mts";
 
-export class State<UUA, UTZ> extends _.CustomType {
+export class State<UTZ, UUA> extends _.CustomType {
   /** @deprecated */
   constructor(
     self: $process.Subject$<Message$<any>>,
@@ -79,13 +79,13 @@ export function State$isState<UTZ, UUA>(value: State$<UUA, UTZ>): boolean;
 export function State$State$0<UTZ, UUA>(value: State$<UUA, UTZ>): $process.Subject$<
   Message$<any>
 >;
-export function State$State$self<UUA, UTZ>(value: State$<UUA, UTZ>): $process.Subject$<
+export function State$State$self<UTZ, UUA>(value: State$<UUA, UTZ>): $process.Subject$<
   Message$<any>
 >;
 export function State$State$1<UTZ, UUA>(value: State$<UUA, UTZ>): $process.Selector$<
   Message$<any>
 >;
-export function State$State$selector<UUA, UTZ>(value: State$<UUA, UTZ>): $process.Selector$<
+export function State$State$selector<UTZ, UUA>(value: State$<UUA, UTZ>): $process.Selector$<
   Message$<any>
 >;
 export function State$State$2<UTZ, UUA>(value: State$<UUA, UTZ>): $process.Selector$<
@@ -94,8 +94,8 @@ export function State$State$2<UTZ, UUA>(value: State$<UUA, UTZ>): $process.Selec
 export function State$State$base_selector<UUA, UTZ>(value: State$<UUA, UTZ>): $process.Selector$<
   Message$<any>
 >;
-export function State$State$3<UTZ, UUA>(value: State$<UUA, UTZ>): UTZ;
-export function State$State$model<UUA, UTZ>(value: State$<UUA, UTZ>): UTZ;
+export function State$State$3<UUA, UTZ>(value: State$<UUA, UTZ>): UTZ;
+export function State$State$model<UTZ, UUA>(value: State$<UUA, UTZ>): UTZ;
 export function State$State$4<UTZ, UUA>(value: State$<UUA, UTZ>): (
   x0: any,
   x1: any
@@ -104,20 +104,20 @@ export function State$State$update<UTZ, UUA>(value: State$<UUA, UTZ>): (
   x0: any,
   x1: any
 ) => [any, $effect.Effect$<any>];
-export function State$State$5<UUA, UTZ>(value: State$<UUA, UTZ>): (x0: any) => $vnode.Element$<
+export function State$State$5<UTZ, UUA>(value: State$<UUA, UTZ>): (x0: any) => $vnode.Element$<
   any
 >;
-export function State$State$view<UTZ, UUA>(value: State$<UUA, UTZ>): (x0: any) => $vnode.Element$<
+export function State$State$view<UUA, UTZ>(value: State$<UUA, UTZ>): (x0: any) => $vnode.Element$<
   any
 >;
 export function State$State$6<UUA, UTZ>(value: State$<UUA, UTZ>): Config$<any>;
-export function State$State$config<UUA, UTZ>(value: State$<UUA, UTZ>): Config$<
+export function State$State$config<UTZ, UUA>(value: State$<UUA, UTZ>): Config$<
   any
 >;
 export function State$State$7<UUA, UTZ>(value: State$<UUA, UTZ>): $vnode.Element$<
   any
 >;
-export function State$State$vdom<UUA, UTZ>(value: State$<UUA, UTZ>): $vnode.Element$<
+export function State$State$vdom<UTZ, UUA>(value: State$<UUA, UTZ>): $vnode.Element$<
   any
 >;
 export function State$State$8<UTZ, UUA>(value: State$<UUA, UTZ>): $cache.Cache$<
@@ -145,7 +145,7 @@ export function State$State$subscribers<UTZ, UUA>(value: State$<UUA, UTZ>): $dic
 export function State$State$11<UUA, UTZ>(value: State$<UUA, UTZ>): $set.Set$<
   (x0: $transport.ClientMessage$<any>) => undefined
 >;
-export function State$State$callbacks<UTZ, UUA>(value: State$<UUA, UTZ>): $set.Set$<
+export function State$State$callbacks<UUA, UTZ>(value: State$<UUA, UTZ>): $set.Set$<
   (x0: $transport.ClientMessage$<any>) => undefined
 >;
 

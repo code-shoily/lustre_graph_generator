@@ -6,7 +6,7 @@ import type * as $effect from "../../lustre/effect.d.mts";
 import type * as $runtime from "../../lustre/runtime/server/runtime.d.mts";
 import type * as $vnode from "../../lustre/vdom/vnode.d.mts";
 
-export class App<UWI, UWJ, UWK> extends _.CustomType {
+export class App<UWK, UWJ, UWI> extends _.CustomType {
   /** @deprecated */
   constructor(
     name: $option.Option$<$process.Name$<$runtime.Message$<any>>>,
@@ -26,49 +26,49 @@ export class App<UWI, UWJ, UWK> extends _.CustomType {
   /** @deprecated */
   config: Config$<any>;
 }
-export function App$App<UWK, UWI, UWJ>(
+export function App$App<UWI, UWJ, UWK>(
   name: $option.Option$<$process.Name$<$runtime.Message$<any>>>,
   init: (x0: any) => [any, $effect.Effect$<any>],
   update: (x0: any, x1: any) => [any, $effect.Effect$<any>],
   view: (x0: any) => $vnode.Element$<any>,
   config: Config$<any>,
-): App$<UWJ, UWI, UWK>;
-export function App$isApp<UWJ, UWI, UWK>(value: App$<UWJ, UWI, UWK>): boolean;
-export function App$App$0<UWI, UWJ, UWK>(value: App$<UWJ, UWI, UWK>): $option.Option$<
+): App$<UWI, UWK, UWJ>;
+export function App$isApp<UWJ, UWK, UWI>(value: App$<UWI, UWK, UWJ>): boolean;
+export function App$App$0<UWJ, UWI, UWK>(value: App$<UWI, UWK, UWJ>): $option.Option$<
   $process.Name$<$runtime.Message$<any>>
 >;
-export function App$App$name<UWJ, UWI, UWK>(value: App$<UWJ, UWI, UWK>): $option.Option$<
+export function App$App$name<UWI, UWK, UWJ>(value: App$<UWI, UWK, UWJ>): $option.Option$<
   $process.Name$<$runtime.Message$<any>>
 >;
-export function App$App$1<UWK, UWI, UWJ>(value: App$<UWJ, UWI, UWK>): (x0: any) => [
+export function App$App$1<UWK, UWJ, UWI>(value: App$<UWI, UWK, UWJ>): (x0: any) => [
   any,
   $effect.Effect$<any>
 ];
-export function App$App$init<UWI, UWJ, UWK>(value: App$<UWJ, UWI, UWK>): (
+export function App$App$init<UWJ, UWK, UWI>(value: App$<UWI, UWK, UWJ>): (
   x0: any
 ) => [any, $effect.Effect$<any>];
-export function App$App$2<UWK, UWI, UWJ>(value: App$<UWJ, UWI, UWK>): (
+export function App$App$2<UWI, UWK, UWJ>(value: App$<UWI, UWK, UWJ>): (
   x0: any,
   x1: any
 ) => [any, $effect.Effect$<any>];
-export function App$App$update<UWK, UWJ, UWI>(value: App$<UWJ, UWI, UWK>): (
+export function App$App$update<UWK, UWI, UWJ>(value: App$<UWI, UWK, UWJ>): (
   x0: any,
   x1: any
 ) => [any, $effect.Effect$<any>];
-export function App$App$3<UWI, UWJ, UWK>(value: App$<UWJ, UWI, UWK>): (x0: any) => $vnode.Element$<
+export function App$App$3<UWI, UWJ, UWK>(value: App$<UWI, UWK, UWJ>): (x0: any) => $vnode.Element$<
   any
 >;
-export function App$App$view<UWI, UWK, UWJ>(value: App$<UWJ, UWI, UWK>): (
+export function App$App$view<UWJ, UWK, UWI>(value: App$<UWI, UWK, UWJ>): (
   x0: any
 ) => $vnode.Element$<any>;
-export function App$App$4<UWJ, UWI, UWK>(value: App$<UWJ, UWI, UWK>): Config$<
+export function App$App$4<UWI, UWJ, UWK>(value: App$<UWI, UWK, UWJ>): Config$<
   any
 >;
-export function App$App$config<UWJ, UWK, UWI>(value: App$<UWJ, UWI, UWK>): Config$<
+export function App$App$config<UWJ, UWK, UWI>(value: App$<UWI, UWK, UWJ>): Config$<
   any
 >;
 
-export type App$<UWJ, UWI, UWK> = App<UWJ, UWK, UWI>;
+export type App$<UWI, UWK, UWJ> = App<UWK, UWI, UWJ>;
 
 export class Config<UWL> extends _.CustomType {
   /** @deprecated */

@@ -237,7 +237,7 @@ declare class Builder<PCQ, PCP> extends _.CustomType {
   tls_options: $option.Option$<$options.TlsCerts$>;
 }
 
-export type Builder$<PCP, PCQ> = Builder<PCP, PCQ>;
+export type Builder$<PCP, PCQ> = Builder<PCQ, PCP>;
 
 export type Socket = $socket.Socket$;
 

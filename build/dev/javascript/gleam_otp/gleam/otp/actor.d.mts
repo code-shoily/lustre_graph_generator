@@ -44,9 +44,9 @@ declare class Stop extends _.CustomType {
   0: $process.ExitReason$;
 }
 
-export type Next$<GMX, GMY> = Continue<GMX, GMY> | Stop;
+export type Next$<GMY, GMX> = Continue<GMX, GMY> | Stop;
 
-declare class Self<GNA, GMZ> extends _.CustomType {
+declare class Self<GMZ, GNA> extends _.CustomType {
   /** @deprecated */
   constructor(
     mode: $system.Mode$,
@@ -92,7 +92,7 @@ export function Started$Started$data<GNB>(value: Started$<GNB>): GNB;
 
 export type Started$<GNB> = Started<GNB>;
 
-declare class Initialised<GNE, GND, GNC> extends _.CustomType {
+declare class Initialised<GNC, GND, GNE> extends _.CustomType {
   /** @deprecated */
   constructor(
     state: GNC,
@@ -107,7 +107,7 @@ declare class Initialised<GNE, GND, GNC> extends _.CustomType {
   return$: GNE;
 }
 
-export type Initialised$<GNC, GND, GNE> = Initialised<GNC, GND, GNE>;
+export type Initialised$<GNE, GND, GNC> = Initialised<GNE, GNC, GND>;
 
 declare class Builder<GNG, GNF, GNH> extends _.CustomType {
   /** @deprecated */
@@ -133,7 +133,7 @@ declare class Builder<GNG, GNF, GNH> extends _.CustomType {
   name: $option.Option$<$process.Name$<any>>;
 }
 
-export type Builder$<GNF, GNG, GNH> = Builder<GNF, GNH, GNG>;
+export type Builder$<GNH, GNF, GNG> = Builder<GNG, GNF, GNH>;
 
 export class InitTimeout extends _.CustomType {}
 export function StartError$InitTimeout(): StartError$;

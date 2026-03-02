@@ -16,21 +16,21 @@ export function Grid$Grid<AMHP, AMHQ>(
   rows: number,
   cols: number,
 ): Grid$<AMHP, AMHQ>;
-export function Grid$isGrid<AMHP, AMHQ>(value: Grid$<AMHP, AMHQ>): boolean;
-export function Grid$Grid$0<AMHQ, AMHP>(value: Grid$<AMHP, AMHQ>): $model.Graph$<
+export function Grid$isGrid<AMHQ, AMHP>(value: Grid$<AMHP, AMHQ>): boolean;
+export function Grid$Grid$0<AMHP, AMHQ>(value: Grid$<AMHP, AMHQ>): $model.Graph$<
   any,
   any
 >;
-export function Grid$Grid$graph<AMHP, AMHQ>(value: Grid$<AMHP, AMHQ>): $model.Graph$<
+export function Grid$Grid$graph<AMHQ, AMHP>(value: Grid$<AMHP, AMHQ>): $model.Graph$<
   any,
   any
 >;
-export function Grid$Grid$1<AMHQ, AMHP>(value: Grid$<AMHP, AMHQ>): number;
-export function Grid$Grid$rows<AMHQ, AMHP>(value: Grid$<AMHP, AMHQ>): number;
-export function Grid$Grid$2<AMHQ, AMHP>(value: Grid$<AMHP, AMHQ>): number;
+export function Grid$Grid$1<AMHP, AMHQ>(value: Grid$<AMHP, AMHQ>): number;
+export function Grid$Grid$rows<AMHP, AMHQ>(value: Grid$<AMHP, AMHQ>): number;
+export function Grid$Grid$2<AMHP, AMHQ>(value: Grid$<AMHP, AMHQ>): number;
 export function Grid$Grid$cols<AMHP, AMHQ>(value: Grid$<AMHP, AMHQ>): number;
 
-export type Grid$<AMHP, AMHQ> = Grid<AMHP, AMHQ>;
+export type Grid$<AMHP, AMHQ> = Grid<AMHQ, AMHP>;
 
 export function coord_to_id(row: number, col: number, cols: number): number;
 

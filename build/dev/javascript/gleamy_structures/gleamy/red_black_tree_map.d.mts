@@ -13,7 +13,7 @@ declare class E extends _.CustomType {}
 
 declare class EE extends _.CustomType {}
 
-declare class T<JYA, JYB> extends _.CustomType {
+declare class T<JYB, JYA> extends _.CustomType {
   /** @deprecated */
   constructor(c: Color$, l: Node$<any, any>, k: [any, any], r: Node$<any, any>);
   /** @deprecated */
@@ -28,7 +28,7 @@ declare class T<JYA, JYB> extends _.CustomType {
 
 type Node$<JYB, JYA> = E | EE | T<JYA, JYB>;
 
-declare class Map<JYD, JYC> extends _.CustomType {
+declare class Map<JYC, JYD> extends _.CustomType {
   /** @deprecated */
   constructor(
     root: Node$<any, any>,
@@ -40,7 +40,7 @@ declare class Map<JYD, JYC> extends _.CustomType {
   compare: (x0: any, x1: any) => $order.Order$;
 }
 
-export type Map$<JYD, JYC> = Map<JYD, JYC>;
+export type Map$<JYD, JYC> = Map<JYC, JYD>;
 
 declare class Min<JYF, JYE> extends _.CustomType {
   /** @deprecated */
@@ -53,7 +53,7 @@ declare class Min<JYF, JYE> extends _.CustomType {
 
 declare class None extends _.CustomType {}
 
-type MinDel$<JYE, JYF> = Min<JYE, JYF> | None;
+type MinDel$<JYE, JYF> = Min<JYF, JYE> | None;
 
 export function new$<JYG>(compare: (x0: JYG, x1: JYG) => $order.Order$): Map$<
   JYG,

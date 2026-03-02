@@ -14,18 +14,18 @@ declare class Supervisor extends _.CustomType {
   pid: $process.Pid$;
 }
 
-declare class NamedSupervisor<HIP, HIQ> extends _.CustomType {
+declare class NamedSupervisor<HIQ, HIP> extends _.CustomType {
   /** @deprecated */
   constructor(name: $process.Name$<Message$<any, any>>);
   /** @deprecated */
   name: $process.Name$<Message$<any, any>>;
 }
 
-export type Supervisor$<HIQ, HIP> = Supervisor | NamedSupervisor<HIP, HIQ>;
+export type Supervisor$<HIP, HIQ> = Supervisor | NamedSupervisor<HIQ, HIP>;
 
-export type Message$<HIR, HIS> = any;
+export type Message$<HIS, HIR> = any;
 
-declare class Builder<HIT, HIU> extends _.CustomType {
+declare class Builder<HIU, HIT> extends _.CustomType {
   /** @deprecated */
   constructor(
     child_type: $supervision.ChildType$,
@@ -53,14 +53,14 @@ export type Builder$<HIU, HIT> = Builder<HIT, HIU>;
 
 type ErlangStartFlags$ = any;
 
-declare class Local<HIW, HIV> extends _.CustomType {
+declare class Local<HIV, HIW> extends _.CustomType {
   /** @deprecated */
   constructor(argument$0: $process.Name$<Message$<any, any>>);
   /** @deprecated */
   0: $process.Name$<Message$<any, any>>;
 }
 
-type ErlangSupervisorName$<HIV, HIW> = Local<HIW, HIV>;
+type ErlangSupervisorName$<HIV, HIW> = Local<HIV, HIW>;
 
 declare class SimpleOneForOne extends _.CustomType {}
 
@@ -98,7 +98,7 @@ declare class Id extends _.CustomType {
   0: number;
 }
 
-declare class Start<HIY, HIZ> extends _.CustomType {
+declare class Start<HIZ, HIY> extends _.CustomType {
   /** @deprecated */
   constructor(
     argument$0: [
@@ -136,7 +136,7 @@ declare class Shutdown extends _.CustomType {
   0: Timeout$;
 }
 
-type ErlangChildSpecProperty$<HIY, HIZ> = Id | Start<HIZ, HIY> | Restart | Type | Shutdown;
+type ErlangChildSpecProperty$<HIZ, HIY> = Id | Start<HIZ, HIY> | Restart | Type | Shutdown;
 
 type Timeout$ = any;
 

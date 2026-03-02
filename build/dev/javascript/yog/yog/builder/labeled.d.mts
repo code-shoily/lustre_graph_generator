@@ -2,7 +2,7 @@ import type * as $dict from "../../../gleam_stdlib/gleam/dict.d.mts";
 import type * as _ from "../../gleam.d.mts";
 import type * as $model from "../../yog/model.d.mts";
 
-export class Builder<AMMD, AMME> extends _.CustomType {
+export class Builder<AMME, AMMD> extends _.CustomType {
   /** @deprecated */
   constructor(
     graph: $model.Graph$<any, any>,
@@ -16,7 +16,7 @@ export class Builder<AMMD, AMME> extends _.CustomType {
   /** @deprecated */
   next_id: number;
 }
-export function Builder$Builder<AMME, AMMD>(
+export function Builder$Builder<AMMD, AMME>(
   graph: $model.Graph$<any, any>,
   label_to_id: $dict.Dict$<any, number>,
   next_id: number,
@@ -28,7 +28,7 @@ export function Builder$Builder$0<AMME, AMMD>(value: Builder$<AMMD, AMME>): $mod
   any,
   any
 >;
-export function Builder$Builder$graph<AMMD, AMME>(value: Builder$<AMMD, AMME>): $model.Graph$<
+export function Builder$Builder$graph<AMME, AMMD>(value: Builder$<AMMD, AMME>): $model.Graph$<
   any,
   any
 >;
@@ -41,11 +41,11 @@ export function Builder$Builder$label_to_id<AMMD, AMME>(value: Builder$<
     AMME
   >): $dict.Dict$<any, number>;
 export function Builder$Builder$2<AMMD, AMME>(value: Builder$<AMMD, AMME>): number;
-export function Builder$Builder$next_id<AMME, AMMD>(
+export function Builder$Builder$next_id<AMMD, AMME>(
   value: Builder$<AMMD, AMME>,
 ): number;
 
-export type Builder$<AMMD, AMME> = Builder<AMME, AMMD>;
+export type Builder$<AMMD, AMME> = Builder<AMMD, AMME>;
 
 export function new$(graph_type: $model.GraphType$): Builder$<any, any>;
 

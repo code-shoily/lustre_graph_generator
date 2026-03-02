@@ -112,7 +112,7 @@ export class Pool<OXL, OXM> extends _.CustomType {
   /** @deprecated */
   transport: $transport.Transport$;
 }
-export function Pool$Pool<OXM, OXL>(
+export function Pool$Pool<OXL, OXM>(
   handler: (
     x0: any,
     x1: $handler.LoopMessage$<any>,
@@ -125,38 +125,38 @@ export function Pool$Pool<OXM, OXL>(
   ],
   on_close: $option.Option$<(x0: any) => undefined>,
   transport: $transport.Transport$,
-): Pool$<OXM, OXL>;
-export function Pool$isPool<OXL, OXM>(value: Pool$<OXM, OXL>): boolean;
-export function Pool$Pool$0<OXL, OXM>(value: Pool$<OXM, OXL>): (
+): Pool$<OXL, OXM>;
+export function Pool$isPool<OXM, OXL>(value: Pool$<OXL, OXM>): boolean;
+export function Pool$Pool$0<OXM, OXL>(value: Pool$<OXL, OXM>): (
   x0: any,
   x1: $handler.LoopMessage$<any>,
   x2: $handler.Connection$<any>
 ) => $handler.Next$<any, $handler.LoopMessage$<any>>;
-export function Pool$Pool$handler<OXM, OXL>(value: Pool$<OXM, OXL>): (
+export function Pool$Pool$handler<OXL, OXM>(value: Pool$<OXL, OXM>): (
   x0: any,
   x1: $handler.LoopMessage$<any>,
   x2: $handler.Connection$<any>
 ) => $handler.Next$<any, $handler.LoopMessage$<any>>;
-export function Pool$Pool$1<OXL, OXM>(value: Pool$<OXM, OXL>): number;
-export function Pool$Pool$pool_count<OXM, OXL>(value: Pool$<OXM, OXL>): number;
-export function Pool$Pool$2<OXM, OXL>(value: Pool$<OXM, OXL>): (
+export function Pool$Pool$1<OXL, OXM>(value: Pool$<OXL, OXM>): number;
+export function Pool$Pool$pool_count<OXM, OXL>(value: Pool$<OXL, OXM>): number;
+export function Pool$Pool$2<OXM, OXL>(value: Pool$<OXL, OXM>): (
   x0: $handler.Connection$<any>
 ) => [any, $option.Option$<$process.Selector$<any>>];
-export function Pool$Pool$on_init<OXM, OXL>(value: Pool$<OXM, OXL>): (
+export function Pool$Pool$on_init<OXL, OXM>(value: Pool$<OXL, OXM>): (
   x0: $handler.Connection$<any>
 ) => [any, $option.Option$<$process.Selector$<any>>];
-export function Pool$Pool$3<OXL, OXM>(value: Pool$<OXM, OXL>): $option.Option$<
+export function Pool$Pool$3<OXL, OXM>(value: Pool$<OXL, OXM>): $option.Option$<
   (x0: any) => undefined
 >;
-export function Pool$Pool$on_close<OXM, OXL>(value: Pool$<OXM, OXL>): $option.Option$<
+export function Pool$Pool$on_close<OXL, OXM>(value: Pool$<OXL, OXM>): $option.Option$<
   (x0: any) => undefined
 >;
-export function Pool$Pool$4<OXM, OXL>(value: Pool$<OXM, OXL>): $transport.Transport$;
-export function Pool$Pool$transport<OXL, OXM>(
-  value: Pool$<OXM, OXL>,
+export function Pool$Pool$4<OXM, OXL>(value: Pool$<OXL, OXM>): $transport.Transport$;
+export function Pool$Pool$transport<OXM, OXL>(
+  value: Pool$<OXL, OXM>,
 ): $transport.Transport$;
 
-export type Pool$<OXM, OXL> = Pool<OXL, OXM>;
+export type Pool$<OXL, OXM> = Pool<OXL, OXM>;
 
 export function start(
   pool: Pool$<any, any>,
