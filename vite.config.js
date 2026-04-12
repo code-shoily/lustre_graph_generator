@@ -6,5 +6,10 @@ export default defineConfig({
     server: {
         port: 8000
     },
-    base: "/lustre_graph_generator/"
+    base: "/lustre_graph_generator/",
+    resolve: {
+        alias: {
+            "node:process": "/process-shim.mjs"
+        }
+    }
 });

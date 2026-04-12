@@ -53,7 +53,7 @@ export function renderGraph(jsonString) {
           style: {
             'height': 8,
             'width': 8,
-            'background-color': '#0ea5e9', /* Cyan 500 */
+            'background-color': '#22c55e', /* Green 500 */
             'border-width': 0,
             'opacity': 0.9,
             'transition-property': 'background-color, opacity',
@@ -64,8 +64,8 @@ export function renderGraph(jsonString) {
           selector: 'edge',
           style: {
             'width': 1,
-            'line-color': '#334155', /* Slate 700 */
-            'target-arrow-color': '#334155',
+            'line-color': '#14532d', /* Green 900 */
+            'target-arrow-color': '#14532d',
             'target-arrow-shape': 'triangle',
             'arrow-scale': 0.5,
             'curve-style': 'bezier',
@@ -114,12 +114,23 @@ export function formatJSON(jsonString) {
   }
 }
 
+export function renderAscii(asciiCode) {
+  const container = document.getElementById('ascii-graph');
+  if (!container) return;
+  container.textContent = asciiCode;
+}
+
 export function renderMermaid(code) {
   const container = document.getElementById('mermaid-graph');
   if (!container) return;
 
   if (!code) {
     container.innerHTML = "";
+    return;
+  }
+
+  if (typeof mermaid === 'undefined') {
+    container.innerHTML = `<p style="color: #ef4444; padding: 1rem; font-family: sans-serif;">Mermaid library not loaded</p>`;
     return;
   }
 
@@ -134,17 +145,49 @@ export function renderMermaid(code) {
 
   const id = 'mermaid-svg-' + Math.random().toString(36).substr(2, 9);
 
+  // Pre-parse to catch syntax errors explicitly
+  try {
+    mermaid.parse(code);
+  } catch (parseErr) {
+    console.error("Mermaid parse error:", parseErr);
+    const msg = parseErr?.str || parseErr?.message || String(parseErr) || 'Invalid Mermaid syntax';
+    container.innerHTML = `<div style="color: #f87171; background: #0a0a0a; border: 1px solid #7f1d1d; border-radius: 0.375rem; padding: 1rem; font-family: monospace; font-size: 0.875rem; white-space: pre-wrap;"><strong style="color:#ef4444;">Mermaid Syntax Error</strong><br/>${escapeHtml(msg)}</div>`;
+    return;
+  }
+
+  // Render with timeout guard
+  let resolved = false;
+  const timeoutId = setTimeout(() => {
+    if (!resolved) {
+      container.innerHTML = `<p style="color: #f87171; background: #0a0a0a; border: 1px solid #7f1d1d; border-radius: 0.375rem; padding: 1rem; font-family: sans-serif;">Mermaid render timed out. The diagram may be too large.</p>`;
+    }
+  }, 5000);
+
   try {
     mermaid.render(id, code).then(({ svg }) => {
+      resolved = true;
+      clearTimeout(timeoutId);
       container.innerHTML = svg;
     }).catch(err => {
+      resolved = true;
+      clearTimeout(timeoutId);
       console.error("Mermaid render error:", err);
-      container.innerHTML = `<p style="color: #ef4444; padding: 1rem;">Mermaid Error: ${err.message || 'Check syntax'}</p>`;
+      const msg = err?.str || err?.message || String(err) || 'Check syntax';
+      container.innerHTML = `<div style="color: #f87171; background: #0a0a0a; border: 1px solid #7f1d1d; border-radius: 0.375rem; padding: 1rem; font-family: monospace; font-size: 0.875rem; white-space: pre-wrap;"><strong style="color:#ef4444;">Mermaid Render Error</strong><br/>${escapeHtml(msg)}</div>`;
     });
   } catch (e) {
+    resolved = true;
+    clearTimeout(timeoutId);
     console.error("Mermaid catch error:", e);
-    container.innerHTML = `<p style="color: #ef4444; padding: 1rem;">Mermaid Error: ${e.message}</p>`;
+    const msg = e?.message || String(e) || 'Unknown error';
+    container.innerHTML = `<div style="color: #b91c1c; background: #fef2f2; border: 1px solid #fecaca; border-radius: 0.375rem; padding: 1rem; font-family: monospace; font-size: 0.875rem; white-space: pre-wrap;"><strong>Mermaid Error</strong><br/>${escapeHtml(msg)}</div>`;
   }
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
 }
 
 let graphvizInstance = null;
@@ -177,7 +220,7 @@ export async function renderDot(code) {
     }
   } catch (err) {
     console.error("DOT render error:", err);
-    container.innerHTML = `<p style="color: #ef4444; padding: 1rem;">DOT Error: ${err.message || 'Check syntax'}</p>`;
+    container.innerHTML = `<div style="color: #f87171; background: #0a0a0a; border: 1px solid #7f1d1d; border-radius: 0.375rem; padding: 1rem; font-family: monospace; font-size: 0.875rem;"><strong style="color:#ef4444;">DOT Error</strong><br/>${escapeHtml(err.message || 'Check syntax')}</div>`;
   }
 }
 
@@ -185,6 +228,7 @@ export function downloadImage(tabType) {
   const isJson = tabType.constructor.name === 'Json';
   const isMermaid = tabType.constructor.name === 'Mermaid';
   const isDot = tabType.constructor.name === 'Dot';
+  const isAscii = tabType.constructor.name === 'Ascii';
 
   if (isJson) {
     if (!cy) return;
@@ -200,6 +244,18 @@ export function downloadImage(tabType) {
     } catch (err) {
       console.error("PNG export error:", err);
     }
+  } else if (isAscii) {
+    const asciiText = document.getElementById('ascii-graph')?.textContent || '';
+    if (!asciiText) return;
+    const blob = new Blob([asciiText], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'maze-ascii.txt';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(url), 100);
   } else if (isMermaid || isDot) {
     const containerId = isMermaid ? 'mermaid-graph' : 'dot-graph';
     const svg = document.querySelector(`#${containerId} svg`);
