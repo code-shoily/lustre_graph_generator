@@ -1160,40 +1160,40 @@ fn generate_dot_code(model: Model) -> String {
 // =============================================================================
 
 fn view(model: Model) -> Element(Msg) {
-  html.div([attribute.class("max-w-[1400px] mx-auto")], [
+  html.div([attribute.class("max-w-[1600px] mx-auto")], [
     html.div(
       [
         attribute.class(
-          "bg-black/80 backdrop-blur-xl border border-green-500/30 rounded overflow-hidden p-12 shadow-[0_0_30px_rgba(34,197,94,0.15)] mb-12",
+          "bg-black/80 backdrop-blur-xl border border-green-500/30 rounded p-6 lg:p-10 xl:p-12 shadow-[0_0_30px_rgba(34,197,94,0.15)] mb-12",
         ),
       ],
       [
+        html.h1(
+          [
+            attribute.class(
+              "text-3xl lg:text-4xl font-extrabold mb-2 text-white leading-tight",
+            ),
+          ],
+          [element.text("YOG_GRAPH_PLAYGROUND")],
+        ),
+        html.p([attribute.class("text-green-600 mb-8 font-medium max-w-2xl")], [
+          element.text(
+            "Generate graphs with Yog v6 and visualize as Cytoscape, Mermaid, DOT, or ASCII mazes!",
+          ),
+        ]),
         html.div(
           [
             attribute.class(
-              "grid grid-cols-1 lg:grid-cols-[350px_1fr] gap-12 mb-12",
+              "grid grid-cols-1 lg:grid-cols-[350px_1fr] xl:grid-cols-[400px_1fr] gap-8 lg:gap-12 mb-12 items-start",
             ),
           ],
           [
             // Left panel - Controls
             html.div([], [
-              html.h1(
-                [
-                  attribute.class(
-                    "text-4xl font-extrabold mb-2 text-white leading-tight",
-                  ),
-                ],
-                [element.text("YOG_GRAPH_PLAYGROUND")],
-              ),
-              html.p([attribute.class("text-green-600 mb-8 font-medium")], [
-                element.text(
-                  "Generate graphs with Yog v6 and visualize as Cytoscape, Mermaid, DOT, or ASCII mazes!",
-                ),
-              ]),
               html.h3(
                 [
                   attribute.class(
-                    "text-green-600 text-[10px] mt-6 mb-3 font-bold uppercase tracking-widest",
+                    "text-green-600 text-[10px] mb-3 font-bold uppercase tracking-widest",
                   ),
                 ],
                 [element.text("Graph Type")],

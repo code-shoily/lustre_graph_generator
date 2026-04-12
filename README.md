@@ -1,5 +1,22 @@
 # YOG GRAPH PLAYGROUND
 
+```text
+┌───────────┬───────────────┐
+│           │               │
+├───┬────   │   ────┐   │   │
+│   │       │       │   │   │
+│   │   ────┼───────┤   └───┤
+│   │       │       │       │
+│   └───┐   │   │   └────   │
+│       │   │   │           │
+│   │   │   │   └───┬────   │
+│   │   │   │       │       │
+│   └───┘   ├────   │   ┌───┤
+│           │       │   │   │
+│   ────────┘   ┌───┘   │   │
+│               │           │
+└───────────────┴───────────┘
+```
 An interactive graph generator and visualizer built with [Gleam](https://gleam.run/), [Lustre](https://lustre.build/), and [Yog v6](https://github.com/mafinar/yog).
 
 [![Package Version](https://img.shields.io/hexpm/v/lustre_graph_generator)](https://hex.pm/packages/lustre_graph_generator)
