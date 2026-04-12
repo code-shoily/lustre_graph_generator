@@ -180,10 +180,11 @@ fn update(m: Model, msg: Msg) -> #(Model, effect.Effect(Msg)) {
     SelectGraphType(graph_type) -> {
       let new_tab = case is_maze(graph_type) {
         True -> Ascii
-        False -> case m.active_tab {
-          Ascii -> Json
-          other -> other
-        }
+        False ->
+          case m.active_tab {
+            Ascii -> Json
+            other -> other
+          }
       }
       #(Model(..m, graph_type: graph_type, active_tab: new_tab), effect.none())
     }
@@ -196,7 +197,10 @@ fn update(m: Model, msg: Msg) -> #(Model, effect.Effect(Msg)) {
     UpdateP(value) -> #(Model(..m, p: value), effect.none())
     UpdateDepth(value) -> #(Model(..m, depth: value), effect.none())
     UpdateArity(value) -> #(Model(..m, arity: value), effect.none())
-    UpdateSpineLength(value) -> #(Model(..m, spine_length: value), effect.none())
+    UpdateSpineLength(value) -> #(
+      Model(..m, spine_length: value),
+      effect.none(),
+    )
     UpdateDegree(value) -> #(Model(..m, degree: value), effect.none())
     UpdateCommunities(value) -> #(Model(..m, communities: value), effect.none())
     UpdateRadius(value) -> #(Model(..m, radius: value), effect.none())
@@ -281,14 +285,16 @@ fn update(m: Model, msg: Msg) -> #(Model, effect.Effect(Msg)) {
           case json == "" && { m.graph_type == CSV || m.graph_type == Matrix } {
             True -> {
               let err = case m.graph_type {
-                CSV -> case parse_csv_to_graph(m.csv_input) {
-                  Error(e) -> e
-                  _ -> "Unknown CSV error"
-                }
-                Matrix -> case parse_matrix_to_graph(m.matrix_input) {
-                  Error(e) -> e
-                  _ -> "Unknown matrix error"
-                }
+                CSV ->
+                  case parse_csv_to_graph(m.csv_input) {
+                    Error(e) -> e
+                    _ -> "Unknown CSV error"
+                  }
+                Matrix ->
+                  case parse_matrix_to_graph(m.matrix_input) {
+                    Error(e) -> e
+                    _ -> "Unknown matrix error"
+                  }
                 _ -> "Unknown error"
               }
               #(Model(..m, validation_error: Some(err)), effect.none())
@@ -478,7 +484,8 @@ fn validate_params(model: Model) -> Result(Nil, String) {
       let m = int.parse(model.width) |> result.unwrap(0)
       let n = int.parse(model.height) |> result.unwrap(0)
       case m > 100 || n > 100 || m * n > 2500 {
-        True -> Error("Bipartite partitions cannot exceed 100 each (max 2500 edges)")
+        True ->
+          Error("Bipartite partitions cannot exceed 100 each (max 2500 edges)")
         False -> Ok(Nil)
       }
     }
@@ -510,7 +517,13 @@ fn validate_params(model: Model) -> Result(Nil, String) {
     }
 
     // Grids & mazes
-    Grid2D | MazeBinaryTree | MazeRecursiveBacktracker | MazeWilson | MazeKruskal | MazePrimTrue | MazeEllers -> {
+    Grid2D
+    | MazeBinaryTree
+    | MazeRecursiveBacktracker
+    | MazeWilson
+    | MazeKruskal
+    | MazePrimTrue
+    | MazeEllers -> {
       let r = int.parse(model.height) |> result.unwrap(0)
       let c = int.parse(model.width) |> result.unwrap(0)
       case r * c > 2500 {
@@ -520,7 +533,13 @@ fn validate_params(model: Model) -> Result(Nil, String) {
     }
 
     // Random graphs
-    ErdosRenyiGnp | ErdosRenyiGnm | BarabasiAlbert | WattsStrogatz | RandomRegular | Sbm | Geometric -> {
+    ErdosRenyiGnp
+    | ErdosRenyiGnm
+    | BarabasiAlbert
+    | WattsStrogatz
+    | RandomRegular
+    | Sbm
+    | Geometric -> {
       let n = int.parse(model.nodes) |> result.unwrap(0)
       case n > 500 {
         True -> Error("Random graph nodes cannot exceed 500")
@@ -538,7 +557,24 @@ fn validate_params(model: Model) -> Result(Nil, String) {
     }
 
     // General sparse classics (catch-all for the rest)
-    Cycle | Path | Star | Wheel | Empty | RandomTree | Petersen | Ladder | CircularLadder | MobiusLadder | Friendship | Book | Crown | Tetrahedron | Cube | Octahedron | Dodecahedron | Icosahedron -> {
+    Cycle
+    | Path
+    | Star
+    | Wheel
+    | Empty
+    | RandomTree
+    | Petersen
+    | Ladder
+    | CircularLadder
+    | MobiusLadder
+    | Friendship
+    | Book
+    | Crown
+    | Tetrahedron
+    | Cube
+    | Octahedron
+    | Dodecahedron
+    | Icosahedron -> {
       let n = int.parse(model.nodes) |> result.unwrap(0)
       case n > 500 {
         True -> Error("Graph nodes cannot exceed 500")
@@ -670,7 +706,9 @@ fn parse_csv_to_graph(input: String) -> Result(model.Graph(String, Int), String)
   }
 }
 
-fn parse_matrix_to_graph(input: String) -> Result(model.Graph(String, Int), String) {
+fn parse_matrix_to_graph(
+  input: String,
+) -> Result(model.Graph(String, Int), String) {
   let lines =
     string.split(input, "\n")
     |> list.filter(fn(l) { !string.is_empty(string.trim(l)) })
@@ -681,17 +719,26 @@ fn parse_matrix_to_graph(input: String) -> Result(model.Graph(String, Int), Stri
       let rows_result =
         lines
         |> list.index_map(fn(line, idx) {
-          let parts =
-            case string.contains(line, ",") {
-              True -> string.split(line, ",") |> list.map(string.trim)
-              False -> string.split(line, " ") |> list.map(string.trim) |> list.filter(fn(s) { !string.is_empty(s) })
-            }
+          let parts = case string.contains(line, ",") {
+            True -> string.split(line, ",") |> list.map(string.trim)
+            False ->
+              string.split(line, " ")
+              |> list.map(string.trim)
+              |> list.filter(fn(s) { !string.is_empty(s) })
+          }
           let parsed =
             parts
             |> list.index_map(fn(val, col_idx) {
               case int.parse(val) {
                 Ok(n) -> Ok(#(col_idx, n))
-                Error(_) -> Error("Row " <> int.to_string(idx + 1) <> ", Col " <> int.to_string(col_idx + 1) <> ": invalid number '")
+                Error(_) ->
+                  Error(
+                    "Row "
+                    <> int.to_string(idx + 1)
+                    <> ", Col "
+                    <> int.to_string(col_idx + 1)
+                    <> ": invalid number '",
+                  )
               }
             })
           case result.all(parsed) {
@@ -712,7 +759,8 @@ fn parse_matrix_to_graph(input: String) -> Result(model.Graph(String, Int), Stri
             |> list.all(fn(c) { c == n })
 
           case all_same {
-            False -> Error("Matrix must be square (same number of rows and columns)")
+            False ->
+              Error("Matrix must be square (same number of rows and columns)")
             True -> {
               let g = model.new(model.Directed)
               let g =
@@ -735,7 +783,14 @@ fn parse_matrix_to_graph(input: String) -> Result(model.Graph(String, Int), Stri
                             let #(col_idx, weight) = pair
                             case weight != 0 {
                               True -> {
-                                case model.add_edge(inner_g, row_idx, col_idx, weight) {
+                                case
+                                  model.add_edge(
+                                    inner_g,
+                                    row_idx,
+                                    col_idx,
+                                    weight,
+                                  )
+                                {
                                   Ok(new_g) -> Ok(new_g)
                                   Error(e) -> Error(e)
                                 }
@@ -990,7 +1045,12 @@ fn generate_base_graph(model: Model) -> model.Graph(Nil, Int) {
       let r = float.parse(model.radius) |> result.unwrap(0.3)
       random.geometric(n, r, seed: None)
     }
-    MazeBinaryTree | MazeRecursiveBacktracker | MazeWilson | MazeKruskal | MazePrimTrue | MazeEllers -> {
+    MazeBinaryTree
+    | MazeRecursiveBacktracker
+    | MazeWilson
+    | MazeKruskal
+    | MazePrimTrue
+    | MazeEllers -> {
       case generate_grid(model) {
         Some(g) -> grid.to_graph(g)
         None -> model.new(model.Undirected)
@@ -1003,7 +1063,12 @@ fn generate_base_graph(model: Model) -> model.Graph(Nil, Int) {
 
 fn is_maze(graph_type: GraphType) -> Bool {
   case graph_type {
-    MazeBinaryTree | MazeRecursiveBacktracker | MazeWilson | MazeKruskal | MazePrimTrue | MazeEllers -> True
+    MazeBinaryTree
+    | MazeRecursiveBacktracker
+    | MazeWilson
+    | MazeKruskal
+    | MazePrimTrue
+    | MazeEllers -> True
     _ -> False
   }
 }
@@ -1051,7 +1116,9 @@ fn generate_ascii(model: Model) -> String {
   }
 }
 
-fn graph_to_string_graph(graph: model.Graph(Nil, Int)) -> model.Graph(String, String) {
+fn graph_to_string_graph(
+  graph: model.Graph(Nil, Int),
+) -> model.Graph(String, String) {
   model.Graph(
     kind: graph.kind,
     nodes: graph.nodes
@@ -1089,21 +1156,22 @@ fn mermaid_options(show_weights: Bool) -> mermaid.MermaidOptions {
 
 fn dot_options(show_weights: Bool) -> dot.DotOptions(String, String) {
   let base = dot.default_dot_options()
-  let base = dot.DotOptions(
-    ..base,
-    bgcolor: Some("#000000"),
-    node_color: "#22c55e",
-    node_style: dot.Filled,
-    node_fontcolor: "#000000",
-    node_shape: dot.Circle,
-    node_fontname: "JetBrains Mono",
-    edge_color: "#14532d",
-    edge_style: dot.Solid,
-    edge_penwidth: 1.5,
-    edge_fontname: "JetBrains Mono",
-    highlight_color: "#4ade80",
-    highlight_penwidth: 2.5,
-  )
+  let base =
+    dot.DotOptions(
+      ..base,
+      bgcolor: Some("#000000"),
+      node_color: "#22c55e",
+      node_style: dot.Filled,
+      node_fontcolor: "#000000",
+      node_shape: dot.Circle,
+      node_fontname: "JetBrains Mono",
+      edge_color: "#14532d",
+      edge_style: dot.Solid,
+      edge_penwidth: 1.5,
+      edge_fontname: "JetBrains Mono",
+      highlight_color: "#4ade80",
+      highlight_penwidth: 2.5,
+    )
   case show_weights {
     True -> base
     False -> dot.DotOptions(..base, edge_label: fn(_) { "" })
@@ -1238,7 +1306,8 @@ fn view(model: Model) -> Element(Msg) {
                       "Sbm" -> SelectGraphType(Sbm)
                       "Geometric" -> SelectGraphType(Geometric)
                       "MazeBinaryTree" -> SelectGraphType(MazeBinaryTree)
-                      "MazeRecursiveBacktracker" -> SelectGraphType(MazeRecursiveBacktracker)
+                      "MazeRecursiveBacktracker" ->
+                        SelectGraphType(MazeRecursiveBacktracker)
                       "MazeWilson" -> SelectGraphType(MazeWilson)
                       "MazeKruskal" -> SelectGraphType(MazeKruskal)
                       "MazePrimTrue" -> SelectGraphType(MazePrimTrue)
@@ -1264,14 +1333,23 @@ fn view(model: Model) -> Element(Msg) {
                     html.option([attribute.value("Empty")], "Empty"),
                     html.option([attribute.value("BinaryTree")], "Binary Tree"),
                     html.option([attribute.value("KAryTree")], "K-Ary Tree"),
-                    html.option([attribute.value("CompleteKAry")], "Complete K-Ary"),
+                    html.option(
+                      [attribute.value("CompleteKAry")],
+                      "Complete K-Ary",
+                    ),
                     html.option([attribute.value("Caterpillar")], "Caterpillar"),
                     html.option([attribute.value("Grid2D")], "Grid 2D"),
                     html.option([attribute.value("Petersen")], "Petersen"),
                     html.option([attribute.value("Hypercube")], "Hypercube"),
                     html.option([attribute.value("Ladder")], "Ladder"),
-                    html.option([attribute.value("CircularLadder")], "Circular Ladder"),
-                    html.option([attribute.value("MobiusLadder")], "Möbius Ladder"),
+                    html.option(
+                      [attribute.value("CircularLadder")],
+                      "Circular Ladder",
+                    ),
+                    html.option(
+                      [attribute.value("MobiusLadder")],
+                      "Möbius Ladder",
+                    ),
                     html.option([attribute.value("Friendship")], "Friendship"),
                     html.option([attribute.value("Windmill")], "Windmill"),
                     html.option([attribute.value("Book")], "Book"),
@@ -1280,7 +1358,10 @@ fn view(model: Model) -> Element(Msg) {
                     html.option([attribute.value("Tetrahedron")], "Tetrahedron"),
                     html.option([attribute.value("Cube")], "Cube"),
                     html.option([attribute.value("Octahedron")], "Octahedron"),
-                    html.option([attribute.value("Dodecahedron")], "Dodecahedron"),
+                    html.option(
+                      [attribute.value("Dodecahedron")],
+                      "Dodecahedron",
+                    ),
                     html.option([attribute.value("Icosahedron")], "Icosahedron"),
                   ]),
                   html.optgroup([attribute.attribute("label", "Random")], [
@@ -1301,16 +1382,37 @@ fn view(model: Model) -> Element(Msg) {
                       "Small-world (WS)",
                     ),
                     html.option([attribute.value("RandomTree")], "Random Tree"),
-                    html.option([attribute.value("RandomRegular")], "Random Regular"),
-                    html.option([attribute.value("Sbm")], "Stochastic Block Model"),
-                    html.option([attribute.value("Geometric")], "Random Geometric"),
+                    html.option(
+                      [attribute.value("RandomRegular")],
+                      "Random Regular",
+                    ),
+                    html.option(
+                      [attribute.value("Sbm")],
+                      "Stochastic Block Model",
+                    ),
+                    html.option(
+                      [attribute.value("Geometric")],
+                      "Random Geometric",
+                    ),
                   ]),
                   html.optgroup([attribute.attribute("label", "Maze")], [
-                    html.option([attribute.value("MazeBinaryTree")], "Maze: Binary Tree"),
-                    html.option([attribute.value("MazeRecursiveBacktracker")], "Maze: Recursive Backtracker"),
+                    html.option(
+                      [attribute.value("MazeBinaryTree")],
+                      "Maze: Binary Tree",
+                    ),
+                    html.option(
+                      [attribute.value("MazeRecursiveBacktracker")],
+                      "Maze: Recursive Backtracker",
+                    ),
                     html.option([attribute.value("MazeWilson")], "Maze: Wilson"),
-                    html.option([attribute.value("MazeKruskal")], "Maze: Kruskal"),
-                    html.option([attribute.value("MazePrimTrue")], "Maze: Prim True"),
+                    html.option(
+                      [attribute.value("MazeKruskal")],
+                      "Maze: Kruskal",
+                    ),
+                    html.option(
+                      [attribute.value("MazePrimTrue")],
+                      "Maze: Prim True",
+                    ),
                     html.option([attribute.value("MazeEllers")], "Maze: Eller"),
                   ]),
                   html.optgroup([attribute.attribute("label", "Other")], [
@@ -1374,7 +1476,8 @@ fn view(model: Model) -> Element(Msg) {
                   tab_button("Mermaid", Mermaid, model.active_tab == Mermaid),
                   tab_button("DOT", Dot, model.active_tab == Dot),
                   case is_maze(model.graph_type) {
-                    True -> tab_button("ASCII", Ascii, model.active_tab == Ascii)
+                    True ->
+                      tab_button("ASCII", Ascii, model.active_tab == Ascii)
                     False -> element.none()
                   },
                 ],
@@ -1461,9 +1564,7 @@ fn json_tab_view(model: Model) -> Element(Msg) {
   html.div([], [
     html.div(
       [
-        attribute.class(
-          "flex justify-between items-center mb-2",
-        ),
+        attribute.class("flex justify-between items-center mb-2"),
       ],
       [
         html.h3(
@@ -1504,12 +1605,9 @@ fn json_tab_view(model: Model) -> Element(Msg) {
     ),
     case model.generated_json {
       "" ->
-        html.p(
-          [attribute.class("text-green-600 mb-8 font-medium")],
-          [
-            element.text("Click 'Generate' to see output"),
-          ],
-        )
+        html.p([attribute.class("text-green-600 mb-8 font-medium")], [
+          element.text("Click 'Generate' to see output"),
+        ])
       json ->
         html.pre(
           [
@@ -1527,9 +1625,7 @@ fn mermaid_tab_view(model: Model) -> Element(Msg) {
   html.div([], [
     html.div(
       [
-        attribute.class(
-          "flex justify-between items-center mb-2",
-        ),
+        attribute.class("flex justify-between items-center mb-2"),
       ],
       [
         html.h3(
@@ -1570,12 +1666,9 @@ fn mermaid_tab_view(model: Model) -> Element(Msg) {
     ),
     case model.mermaid_code {
       "" ->
-        html.p(
-          [attribute.class("text-green-600 mb-8 font-medium")],
-          [
-            element.text("Click 'Generate' to see definition"),
-          ],
-        )
+        html.p([attribute.class("text-green-600 mb-8 font-medium")], [
+          element.text("Click 'Generate' to see definition"),
+        ])
       code ->
         html.pre(
           [
@@ -1593,9 +1686,7 @@ fn dot_tab_view(model: Model) -> Element(Msg) {
   html.div([], [
     html.div(
       [
-        attribute.class(
-          "flex justify-between items-center mb-2",
-        ),
+        attribute.class("flex justify-between items-center mb-2"),
       ],
       [
         html.h3(
@@ -1636,12 +1727,9 @@ fn dot_tab_view(model: Model) -> Element(Msg) {
     ),
     case model.dot_code {
       "" ->
-        html.p(
-          [attribute.class("text-green-600 mb-8 font-medium")],
-          [
-            element.text("Click 'Generate' to see definition"),
-          ],
-        )
+        html.p([attribute.class("text-green-600 mb-8 font-medium")], [
+          element.text("Click 'Generate' to see definition"),
+        ])
       code ->
         html.pre(
           [
@@ -1659,9 +1747,7 @@ fn ascii_tab_view(model: Model) -> Element(Msg) {
   html.div([], [
     html.div(
       [
-        attribute.class(
-          "flex justify-between items-center mb-2",
-        ),
+        attribute.class("flex justify-between items-center mb-2"),
       ],
       [
         html.h3(
@@ -1693,12 +1779,9 @@ fn ascii_tab_view(model: Model) -> Element(Msg) {
     ),
     case model.ascii_code {
       "" ->
-        html.p(
-          [attribute.class("text-green-600 mb-8 font-medium")],
-          [
-            element.text("Click 'Generate' to see ASCII art"),
-          ],
-        )
+        html.p([attribute.class("text-green-600 mb-8 font-medium")], [
+          element.text("Click 'Generate' to see ASCII art"),
+        ])
       code ->
         html.pre(
           [
@@ -1777,7 +1860,19 @@ fn graph_type_to_string(graph_type: GraphType) -> String {
 
 fn parameters_form(model: Model) -> Element(Msg) {
   html.div([], case model.graph_type {
-    Complete | Cycle | Path | Star | Wheel | Empty | RandomTree | Petersen | Tetrahedron | Cube | Octahedron | Dodecahedron | Icosahedron -> [
+    Complete
+    | Cycle
+    | Path
+    | Star
+    | Wheel
+    | Empty
+    | RandomTree
+    | Petersen
+    | Tetrahedron
+    | Cube
+    | Octahedron
+    | Dodecahedron
+    | Icosahedron -> [
       input_field("Nodes", model.nodes, UpdateNodes, "number", "1"),
     ]
     Bipartite -> [
@@ -1797,9 +1892,21 @@ fn parameters_form(model: Model) -> Element(Msg) {
     ]
     Caterpillar -> [
       input_field("Nodes", model.nodes, UpdateNodes, "number", "1"),
-      input_field("Spine Length", model.spine_length, UpdateSpineLength, "number", "1"),
+      input_field(
+        "Spine Length",
+        model.spine_length,
+        UpdateSpineLength,
+        "number",
+        "1",
+      ),
     ]
-    Grid2D | MazeBinaryTree | MazeRecursiveBacktracker | MazeWilson | MazeKruskal | MazePrimTrue | MazeEllers -> [
+    Grid2D
+    | MazeBinaryTree
+    | MazeRecursiveBacktracker
+    | MazeWilson
+    | MazeKruskal
+    | MazePrimTrue
+    | MazeEllers -> [
       input_field("Rows", model.height, UpdateHeight, "number", "1"),
       input_field("Cols", model.width, UpdateWidth, "number", "1"),
     ]
@@ -1840,7 +1947,13 @@ fn parameters_form(model: Model) -> Element(Msg) {
     ]
     Sbm -> [
       input_field("Nodes", model.nodes, UpdateNodes, "number", "1"),
-      input_field("Communities", model.communities, UpdateCommunities, "number", "1"),
+      input_field(
+        "Communities",
+        model.communities,
+        UpdateCommunities,
+        "number",
+        "1",
+      ),
       input_field("P in", model.p, UpdateP, "number", "0.01"),
       input_field("P out", model.density, UpdateDensity, "number", "0.01"),
     ]
@@ -1856,11 +1969,13 @@ fn parameters_form(model: Model) -> Element(Msg) {
               "block text-green-600 text-[10px] font-bold uppercase tracking-widest mb-1",
             ),
           ],
-          [element.text(case model.graph_type {
-            Matrix -> "Adjacency Matrix (0 = no edge)"
-            CSV -> "CSV Input (From, To, Weight)"
-            _ -> "Input"
-          })],
+          [
+            element.text(case model.graph_type {
+              Matrix -> "Adjacency Matrix (0 = no edge)"
+              CSV -> "CSV Input (From, To, Weight)"
+              _ -> "Input"
+            }),
+          ],
         ),
         html.textarea(
           [
